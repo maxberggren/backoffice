@@ -63,7 +63,7 @@ export function createTemperatureHistogram(
 
 export function calculateDailySavings(
   data: AIAnalysisDataRow[],
-  signalName: string,
+  _signalName: string,
   histogram: TemperatureHistogram,
   savingsStartDate: Date,
   savingsEndDate: Date

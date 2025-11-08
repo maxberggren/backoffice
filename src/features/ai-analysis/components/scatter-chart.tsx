@@ -71,12 +71,12 @@ export function SignalTemperatureScatterChart({ data, signalName, isLoading }: S
           />
           <Legend />
           <Scatter name='Control = OFF' data={offData} fill='#c6cacc' fillOpacity={0.6}>
-            {offData.map((entry, index) => (
+            {offData.map((_entry, index) => (
               <Cell key={`off-${index}`} fill='#c6cacc' fillOpacity={0.6} />
             ))}
           </Scatter>
           <Scatter name='Control = ON' data={onData} fill='#e2673b' fillOpacity={0.6}>
-            {onData.map((entry, index) => (
+            {onData.map((_entry, index) => (
               <Cell key={`on-${index}`} fill='#e2673b' fillOpacity={0.6} />
             ))}
           </Scatter>

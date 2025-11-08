@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { getCookie, setCookie } from '@/lib/cookies'
+import { setCookie } from '@/lib/cookies'
 import { type Building } from '@/features/users/data/schema'
 
 const BUILDING_COOKIE_NAME = 'selected-building-id'
@@ -11,8 +11,6 @@ interface BuildingState {
 }
 
 export const useBuildingStore = create<BuildingState>()((set) => {
-  const savedBuildingId = getCookie(BUILDING_COOKIE_NAME)
-  
   return {
     selectedBuilding: null,
     setSelectedBuilding: (building) => {

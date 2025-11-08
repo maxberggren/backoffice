@@ -1,4 +1,4 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, ErrorBar, Cell } from 'recharts'
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, Cell } from 'recharts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -144,22 +144,6 @@ export function TemperatureAnalysisTab({
                       fillOpacity={entry.isReliable ? 1 : 0.3}
                     />
                   ))}
-                  {chartData.map((entry, index) => (
-                    <ErrorBar
-                      key={`on-error-${index}`}
-                      dataKey='onMean'
-                      width={4}
-                      strokeWidth={2}
-                      stroke='#b0512f'
-                      strokeOpacity={entry.isReliable ? 1 : 0.3}
-                      direction='y'
-                      yAxis={entry.onMean}
-                      yAxisError={[
-                        [entry.onMean - entry.onP25],
-                        [entry.onP975 - entry.onMean],
-                      ]}
-                    />
-                  ))}
                 </Bar>
                 <Bar
                   dataKey='offMean'
@@ -171,22 +155,6 @@ export function TemperatureAnalysisTab({
                       key={`off-cell-${index}`}
                       fill='#c6cacc'
                       fillOpacity={entry.isReliable ? 1 : 0.3}
-                    />
-                  ))}
-                  {chartData.map((entry, index) => (
-                    <ErrorBar
-                      key={`off-error-${index}`}
-                      dataKey='offMean'
-                      width={4}
-                      strokeWidth={2}
-                      stroke='#a2a6a8'
-                      strokeOpacity={entry.isReliable ? 1 : 0.3}
-                      direction='y'
-                      yAxis={entry.offMean}
-                      yAxisError={[
-                        [entry.offMean - entry.offP25],
-                        [entry.offP975 - entry.offMean],
-                      ]}
                     />
                   ))}
                 </Bar>

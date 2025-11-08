@@ -80,7 +80,7 @@ export function calculateBinStats(
 
 export function findReliableBins(
   bins: Map<number, TemperatureBin>,
-  minSamples: number
+  _minSamples: number
 ): number[] {
   return Array.from(bins.values())
     .filter((bin) => bin.isReliable)

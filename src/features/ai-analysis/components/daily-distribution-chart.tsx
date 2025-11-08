@@ -42,7 +42,7 @@ export function DailyDistributionChart({ data, isLoading }: DailyDistributionCha
           />
           <YAxis stroke='#888888' fontSize={12} tickLine={false} axisLine={false} />
           <Tooltip
-            content={({ active, payload, label }) => {
+            content={({ active, payload }) => {
               if (!active || !payload?.length) return null
               const data = payload[0].payload
               return (

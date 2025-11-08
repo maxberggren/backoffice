@@ -161,9 +161,14 @@ export function exportTableToCSV<TData>(
     if (typeof headerDef === 'function') {
       // Render the header to get its text content
       try {
-        const headerValue = headerDef({ column, header: column, table })
-        const text = extractTextContent(headerValue)
-        if (text) return text
+        // Get header from table's header groups
+        const headerGroups = table.getHeaderGroups()
+        const header = headerGroups[0]?.headers.find((h) => h.id === column.id)
+        if (header) {
+          const headerValue = headerDef(header.getContext())
+          const text = extractTextContent(headerValue)
+          if (text) return text
+        }
       } catch {
         // Fallback if rendering fails
       }

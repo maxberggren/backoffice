@@ -23,10 +23,10 @@ export function UsersDeleteDialog({
   const [value, setValue] = useState('')
 
   const handleDelete = () => {
-    if (value.trim() !== currentRow.username) return
+    if (value.trim() !== currentRow.name) return
 
     onOpenChange(false)
-    showSubmittedData(currentRow, 'The following user has been deleted:')
+    showSubmittedData(currentRow, 'The following building has been deleted:')
   }
 
   return (
@@ -34,7 +34,7 @@ export function UsersDeleteDialog({
       open={open}
       onOpenChange={onOpenChange}
       handleConfirm={handleDelete}
-      disabled={value.trim() !== currentRow.username}
+      disabled={value.trim() !== currentRow.name}
       title={
         <span className='text-destructive'>
           <AlertTriangle
@@ -48,21 +48,21 @@ export function UsersDeleteDialog({
         <div className='space-y-4'>
           <p className='mb-2'>
             Are you sure you want to delete{' '}
-            <span className='font-bold'>{currentRow.username}</span>?
+            <span className='font-bold'>{currentRow.name}</span>?
             <br />
-            This action will permanently remove the user with the role of{' '}
+            This action will permanently remove the building with the type of{' '}
             <span className='font-bold'>
-              {currentRow.role.toUpperCase()}
+              {currentRow.type.toUpperCase()}
             </span>{' '}
             from the system. This cannot be undone.
           </p>
 
           <Label className='my-2'>
-            Username:
+            Building Name:
             <Input
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              placeholder='Enter username to confirm deletion.'
+              placeholder='Enter building name to confirm deletion.'
             />
           </Label>
 

@@ -1,4 +1,4 @@
-import { format, parseISO, startOfDay } from 'date-fns'
+import { startOfDay } from 'date-fns'
 import { type AIAnalysisDataRow, type ControlState, type AnalysisConfig } from '../data/schema'
 
 export function parseCSVRow(row: string[], headers: string[]): AIAnalysisDataRow {

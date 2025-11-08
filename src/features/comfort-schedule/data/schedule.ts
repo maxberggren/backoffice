@@ -53,15 +53,6 @@ function seededRandom(seed: string): number {
   return (h % 1000) / 1000
 }
 
-// Generate multiple noise values for more variation
-function getNoise(seed: string, count: number = 3): number[] {
-  const noises: number[] = []
-  for (let i = 0; i < count; i++) {
-    noises.push(seededRandom(`${seed}-noise-${i}`))
-  }
-  return noises
-}
-
 // Generate CO2 levels for visualization (proxy for occupancy)
 export function getCO2Level(day: string, hour: number): number {
   const dayIndex = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'].indexOf(day)

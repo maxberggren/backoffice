@@ -3,16 +3,15 @@ import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } fro
 import { DatePicker } from '@/components/date-picker'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { format, parseISO, startOfWeek, startOfMonth } from 'date-fns'
-import { type SavingsData, type AnalysisConfig } from '../data/schema'
+import { type AnalysisConfig } from '../data/schema'
 import { useFilteredData } from '../data/api-service'
 import { createTemperatureHistogram, calculateDailySavings } from '../utils/savings-calculations'
 import { calculateAverageSignal } from '../utils/data-processing'
-import { getSignalsForCategory } from '../data/signal-categories'
 
 interface SavingsSectionProps {
   config: AnalysisConfig
@@ -46,7 +45,6 @@ export function SavingsSection({ config, signalName, minSamples, categorySignals
 
   const totalSavings = savingsData.reduce((sum, d) => sum + d.actualSavings, 0)
   const totalPotential = savingsData.reduce((sum, d) => sum + d.potentialSavings, 0)
-  const totalForfeited = savingsData.reduce((sum, d) => sum + d.forfeitedSavings, 0)
   const days = savingsData.length
   const avgUptime = savingsData.length > 0
     ? savingsData.reduce((sum, d) => sum + d.uptime, 0) / savingsData.length

@@ -84,7 +84,7 @@ const generateAiOutputEntries = (timePeriod: string): AiOutputEntry[] => {
 }
 
 // Generate detailed data for an entry
-const generateDetailedData = (entryId: string): AiOutputData[] => {
+const generateDetailedData = (_entryId: string): AiOutputData[] => {
   return [
     { signal: 'LB11_GP101', key: 'LB11_GP101_PV', output: 118.01, readValue: null, diff: null, writes: 1 },
     { signal: 'LB11_GP102', key: 'LB11_GP102_PV', output: 175.61, readValue: null, diff: null, writes: 1 },

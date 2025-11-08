@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
+import { Avatar } from '@/components/ui/avatar'
 import { Building2, Thermometer, AlertTriangle, CheckCircle, Settings } from 'lucide-react'
 
 export function RecentSales() {

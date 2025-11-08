@@ -9,8 +9,7 @@ import {
   type SignalAvailability,
 } from './schema'
 import { parseCSVRow, filterByControlAndDates, filterByTemperature, filterByHour, calculateAverageSignal } from '../utils/data-processing'
-import { calculateBinStats, findReliableBins, findOverlapBins } from '../utils/temperature-binning'
-import { getSignalsForCategory } from './signal-categories'
+import { calculateBinStats } from '../utils/temperature-binning'
 
 let cachedData: AIAnalysisDataRow[] | null = null
 
@@ -211,7 +210,6 @@ export function useTemperatureAnalysis(
       }
 
       const bins = calculateBinStats(data, actualSignalName, config.minSamplesThreshold)
-      const reliableBins = findReliableBins(bins, config.minSamplesThreshold)
 
       // Calculate impact metrics
       const overlapBins = Array.from(bins.values()).filter((b) => b.isReliable)
