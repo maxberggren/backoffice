@@ -1,0 +1,10 @@
+# Nixpacks configuration for Coolify
+# This tells Nixpacks how to build and run the application
+
+# Build phase
+phases.setup = "pnpm install"
+phases.build = "pnpm run build"
+
+# Start command
+start = "pnpm start"
+
