@@ -3,12 +3,11 @@ import {
   LayoutDashboard,
   Monitor,
   Bug,
-  ListTodo,
   FileX,
   HelpCircle,
   Lock,
   Bell,
-  Package,
+  Thermometer,
   Palette,
   ServerOff,
   Settings,
@@ -16,41 +15,47 @@ import {
   UserCog,
   UserX,
   Users,
-  MessagesSquare,
   ShieldCheck,
-  AudioWaveform,
-  Command,
   GalleryVerticalEnd,
+  Building2,
+  AlertTriangle,
+  Cpu,
+  Activity,
+  TrendingUp,
+  Calendar,
+  Download,
+  Sparkles,
+  Table2,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
+    name: 'Max Berggren',
+    email: 'max@myrspoven.com',
     avatar: '/avatars/shadcn.jpg',
   },
   teams: [
     {
-      name: 'Shadcn Admin',
-      logo: Command,
-      plan: 'Vite + ShadcnUI',
+      name: 'HVAC AI Control',
+      logo: Thermometer,
+      plan: 'AI-Powered',
     },
     {
-      name: 'Acme Inc',
+      name: 'Building Portfolio A',
+      logo: Building2,
+      plan: '12 Buildings',
+    },
+    {
+      name: 'Building Portfolio B',
       logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
+      plan: '8 Buildings',
     },
   ],
   navGroups: [
     {
-      title: 'General',
+      title: 'Monitoring',
       items: [
         {
           title: 'Dashboard',
@@ -58,24 +63,75 @@ export const sidebarData: SidebarData = {
           icon: LayoutDashboard,
         },
         {
-          title: 'Tasks',
+          title: 'Process Viewer',
+          url: '/process-viewer',
+          icon: Table2,
+        },
+        {
+          title: 'Alerts',
           url: '/tasks',
-          icon: ListTodo,
-        },
-        {
-          title: 'Apps',
-          url: '/apps',
-          icon: Package,
-        },
-        {
-          title: 'Chats',
-          url: '/chats',
           badge: '3',
-          icon: MessagesSquare,
+          icon: AlertTriangle,
+        },
+      ],
+    },
+    {
+      title: 'Signals',
+      items: [
+        {
+          title: 'Signal Viewer',
+          url: '/signals/viewer',
+          icon: Activity,
         },
         {
-          title: 'Users',
-          url: '/users',
+          title: 'Export to Excel',
+          url: '/signals/export',
+          icon: Download,
+        },
+      ],
+    },
+    {
+      title: 'AI',
+      items: [
+        {
+          title: 'AI Output',
+          url: '/signals/ai-output',
+          icon: Sparkles,
+        },
+        {
+          title: 'AI ON vs OFF',
+          url: '/analysis/ai-on-vs-off',
+          icon: TrendingUp,
+        },
+        {
+          title: 'Maintenance',
+          url: '/maintenance',
+          icon: Wrench,
+        },
+        {
+          title: 'AI Models',
+          url: '/apps',
+          icon: Cpu,
+        },
+        {
+          title: 'Configuration',
+          url: '/buildings/:buildingId/config',
+          icon: Building2,
+          dynamicUrl: true,
+        },
+        {
+          title: 'Comfort Schedule',
+          url: '/comfort-schedule',
+          icon: Calendar,
+        },
+      ],
+    },
+    {
+      title: 'Administration',
+      items: [
+        {
+          title: 'Operators',
+          url: '/clerk/user-management',
           icon: Users,
         },
         {
@@ -99,10 +155,77 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Pages',
+      title: 'System',
       items: [
         {
-          title: 'Auth',
+          title: 'Settings',
+          icon: Settings,
+          items: [
+            {
+              title: 'Profile',
+              url: '/settings',
+              icon: UserCog,
+            },
+            {
+              title: 'AI Configuration',
+              url: '/settings/account',
+              icon: Cpu,
+            },
+            {
+              title: 'Appearance',
+              url: '/settings/appearance',
+              icon: Palette,
+            },
+            {
+              title: 'Notifications',
+              url: '/settings/notifications',
+              icon: Bell,
+            },
+            {
+              title: 'Display',
+              url: '/settings/display',
+              icon: Monitor,
+            },
+          ],
+        },
+        {
+          title: 'Documentation',
+          url: '/help-center',
+          icon: HelpCircle,
+        },
+        {
+          title: 'Error Pages',
+          icon: Bug,
+          items: [
+            {
+              title: 'Unauthorized',
+              url: '/errors/unauthorized',
+              icon: Lock,
+            },
+            {
+              title: 'Forbidden',
+              url: '/errors/forbidden',
+              icon: UserX,
+            },
+            {
+              title: 'Not Found',
+              url: '/errors/not-found',
+              icon: FileX,
+            },
+            {
+              title: 'Server Error',
+              url: '/errors/internal-server-error',
+              icon: ServerOff,
+            },
+            {
+              title: 'Maintenance',
+              url: '/errors/maintenance-error',
+              icon: Construction,
+            },
+          ],
+        },
+        {
+          title: 'Auth Pages',
           icon: ShieldCheck,
           items: [
             {
@@ -127,79 +250,8 @@ export const sidebarData: SidebarData = {
             },
           ],
         },
-        {
-          title: 'Errors',
-          icon: Bug,
-          items: [
-            {
-              title: 'Unauthorized',
-              url: '/errors/unauthorized',
-              icon: Lock,
-            },
-            {
-              title: 'Forbidden',
-              url: '/errors/forbidden',
-              icon: UserX,
-            },
-            {
-              title: 'Not Found',
-              url: '/errors/not-found',
-              icon: FileX,
-            },
-            {
-              title: 'Internal Server Error',
-              url: '/errors/internal-server-error',
-              icon: ServerOff,
-            },
-            {
-              title: 'Maintenance Error',
-              url: '/errors/maintenance-error',
-              icon: Construction,
-            },
-          ],
-        },
-      ],
-    },
-    {
-      title: 'Other',
-      items: [
-        {
-          title: 'Settings',
-          icon: Settings,
-          items: [
-            {
-              title: 'Profile',
-              url: '/settings',
-              icon: UserCog,
-            },
-            {
-              title: 'Account',
-              url: '/settings/account',
-              icon: Wrench,
-            },
-            {
-              title: 'Appearance',
-              url: '/settings/appearance',
-              icon: Palette,
-            },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: Bell,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: Monitor,
-            },
-          ],
-        },
-        {
-          title: 'Help Center',
-          url: '/help-center',
-          icon: HelpCircle,
-        },
       ],
     },
   ],
 }
+

@@ -28,7 +28,7 @@ export function DatePicker({
           className='data-[empty=true]:text-muted-foreground w-[240px] justify-start text-start font-normal'
         >
           {selected ? (
-            format(selected, 'MMM d, yyyy')
+            format(selected, 'yyyy-MM-dd')
           ) : (
             <span>{placeholder}</span>
           )}

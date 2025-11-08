@@ -28,17 +28,26 @@ import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
+import { Route as AuthenticatedProcessViewerIndexRouteImport } from './routes/_authenticated/process-viewer/index'
+import { Route as AuthenticatedMaintenanceIndexRouteImport } from './routes/_authenticated/maintenance/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
+import { Route as AuthenticatedComfortScheduleIndexRouteImport } from './routes/_authenticated/comfort-schedule/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
+import { Route as AuthenticatedUsersBuildingIdRouteImport } from './routes/_authenticated/users/$buildingId'
+import { Route as AuthenticatedSignalsViewerRouteImport } from './routes/_authenticated/signals/viewer'
+import { Route as AuthenticatedSignalsExportRouteImport } from './routes/_authenticated/signals/export'
+import { Route as AuthenticatedSignalsAiOutputRouteImport } from './routes/_authenticated/signals/ai-output'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedAnalysisAiOnVsOffIndexRouteImport } from './routes/_authenticated/analysis/ai-on-vs-off/index'
+import { Route as AuthenticatedBuildingsBuildingIdConfigRouteImport } from './routes/_authenticated/buildings/$buildingId/config'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -134,10 +143,28 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
+const AuthenticatedProcessViewerIndexRoute =
+  AuthenticatedProcessViewerIndexRouteImport.update({
+    id: '/process-viewer/',
+    path: '/process-viewer/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMaintenanceIndexRoute =
+  AuthenticatedMaintenanceIndexRouteImport.update({
+    id: '/maintenance/',
+    path: '/maintenance/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
     path: '/help-center/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedComfortScheduleIndexRoute =
+  AuthenticatedComfortScheduleIndexRouteImport.update({
+    id: '/comfort-schedule/',
+    path: '/comfort-schedule/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
@@ -166,6 +193,30 @@ const ClerkauthSignInRoute = ClerkauthSignInRouteImport.update({
   path: '/sign-in',
   getParentRoute: () => ClerkauthRouteRoute,
 } as any)
+const AuthenticatedUsersBuildingIdRoute =
+  AuthenticatedUsersBuildingIdRouteImport.update({
+    id: '/users/$buildingId',
+    path: '/users/$buildingId',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSignalsViewerRoute =
+  AuthenticatedSignalsViewerRouteImport.update({
+    id: '/signals/viewer',
+    path: '/signals/viewer',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSignalsExportRoute =
+  AuthenticatedSignalsExportRouteImport.update({
+    id: '/signals/export',
+    path: '/signals/export',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedSignalsAiOutputRoute =
+  AuthenticatedSignalsAiOutputRouteImport.update({
+    id: '/signals/ai-output',
+    path: '/signals/ai-output',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSettingsNotificationsRoute =
   AuthenticatedSettingsNotificationsRouteImport.update({
     id: '/notifications',
@@ -196,6 +247,18 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAnalysisAiOnVsOffIndexRoute =
+  AuthenticatedAnalysisAiOnVsOffIndexRouteImport.update({
+    id: '/analysis/ai-on-vs-off/',
+    path: '/analysis/ai-on-vs-off/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigRoute =
+  AuthenticatedBuildingsBuildingIdConfigRouteImport.update({
+    id: '/buildings/$buildingId/config',
+    path: '/buildings/$buildingId/config',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -217,15 +280,24 @@ export interface FileRoutesByFullPath {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
+  '/signals/export': typeof AuthenticatedSignalsExportRoute
+  '/signals/viewer': typeof AuthenticatedSignalsViewerRoute
+  '/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/comfort-schedule': typeof AuthenticatedComfortScheduleIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/maintenance': typeof AuthenticatedMaintenanceIndexRoute
+  '/process-viewer': typeof AuthenticatedProcessViewerIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  '/analysis/ai-on-vs-off': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -245,15 +317,24 @@ export interface FileRoutesByTo {
   '/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
+  '/signals/export': typeof AuthenticatedSignalsExportRoute
+  '/signals/viewer': typeof AuthenticatedSignalsViewerRoute
+  '/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
+  '/comfort-schedule': typeof AuthenticatedComfortScheduleIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
+  '/maintenance': typeof AuthenticatedMaintenanceIndexRoute
+  '/process-viewer': typeof AuthenticatedProcessViewerIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
+  '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  '/analysis/ai-on-vs-off': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -278,15 +359,24 @@ export interface FileRoutesById {
   '/_authenticated/settings/appearance': typeof AuthenticatedSettingsAppearanceRoute
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
+  '/_authenticated/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
+  '/_authenticated/signals/export': typeof AuthenticatedSignalsExportRoute
+  '/_authenticated/signals/viewer': typeof AuthenticatedSignalsViewerRoute
+  '/_authenticated/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
+  '/_authenticated/comfort-schedule/': typeof AuthenticatedComfortScheduleIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
+  '/_authenticated/maintenance/': typeof AuthenticatedMaintenanceIndexRoute
+  '/_authenticated/process-viewer/': typeof AuthenticatedProcessViewerIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
+  '/_authenticated/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  '/_authenticated/analysis/ai-on-vs-off/': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -310,15 +400,24 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/signals/ai-output'
+    | '/signals/export'
+    | '/signals/viewer'
+    | '/users/$buildingId'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
     | '/chats'
+    | '/comfort-schedule'
     | '/help-center'
+    | '/maintenance'
+    | '/process-viewer'
     | '/settings/'
     | '/tasks'
     | '/users'
+    | '/buildings/$buildingId/config'
+    | '/analysis/ai-on-vs-off'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -338,15 +437,24 @@ export interface FileRouteTypes {
     | '/settings/appearance'
     | '/settings/display'
     | '/settings/notifications'
+    | '/signals/ai-output'
+    | '/signals/export'
+    | '/signals/viewer'
+    | '/users/$buildingId'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/apps'
     | '/chats'
+    | '/comfort-schedule'
     | '/help-center'
+    | '/maintenance'
+    | '/process-viewer'
     | '/settings'
     | '/tasks'
     | '/users'
+    | '/buildings/$buildingId/config'
+    | '/analysis/ai-on-vs-off'
   id:
     | '__root__'
     | '/_authenticated'
@@ -370,15 +478,24 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/appearance'
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
+    | '/_authenticated/signals/ai-output'
+    | '/_authenticated/signals/export'
+    | '/_authenticated/signals/viewer'
+    | '/_authenticated/users/$buildingId'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
+    | '/_authenticated/comfort-schedule/'
     | '/_authenticated/help-center/'
+    | '/_authenticated/maintenance/'
+    | '/_authenticated/process-viewer/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
+    | '/_authenticated/buildings/$buildingId/config'
+    | '/_authenticated/analysis/ai-on-vs-off/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -531,11 +648,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
+    '/_authenticated/process-viewer/': {
+      id: '/_authenticated/process-viewer/'
+      path: '/process-viewer'
+      fullPath: '/process-viewer'
+      preLoaderRoute: typeof AuthenticatedProcessViewerIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/maintenance/': {
+      id: '/_authenticated/maintenance/'
+      path: '/maintenance'
+      fullPath: '/maintenance'
+      preLoaderRoute: typeof AuthenticatedMaintenanceIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
       fullPath: '/help-center'
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/comfort-schedule/': {
+      id: '/_authenticated/comfort-schedule/'
+      path: '/comfort-schedule'
+      fullPath: '/comfort-schedule'
+      preLoaderRoute: typeof AuthenticatedComfortScheduleIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/chats/': {
@@ -573,6 +711,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClerkauthSignInRouteImport
       parentRoute: typeof ClerkauthRouteRoute
     }
+    '/_authenticated/users/$buildingId': {
+      id: '/_authenticated/users/$buildingId'
+      path: '/users/$buildingId'
+      fullPath: '/users/$buildingId'
+      preLoaderRoute: typeof AuthenticatedUsersBuildingIdRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/signals/viewer': {
+      id: '/_authenticated/signals/viewer'
+      path: '/signals/viewer'
+      fullPath: '/signals/viewer'
+      preLoaderRoute: typeof AuthenticatedSignalsViewerRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/signals/export': {
+      id: '/_authenticated/signals/export'
+      path: '/signals/export'
+      fullPath: '/signals/export'
+      preLoaderRoute: typeof AuthenticatedSignalsExportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/signals/ai-output': {
+      id: '/_authenticated/signals/ai-output'
+      path: '/signals/ai-output'
+      fullPath: '/signals/ai-output'
+      preLoaderRoute: typeof AuthenticatedSignalsAiOutputRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/settings/notifications': {
       id: '/_authenticated/settings/notifications'
       path: '/notifications'
@@ -608,6 +774,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/analysis/ai-on-vs-off/': {
+      id: '/_authenticated/analysis/ai-on-vs-off/'
+      path: '/analysis/ai-on-vs-off'
+      fullPath: '/analysis/ai-on-vs-off'
+      preLoaderRoute: typeof AuthenticatedAnalysisAiOnVsOffIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config': {
+      id: '/_authenticated/buildings/$buildingId/config'
+      path: '/buildings/$buildingId/config'
+      fullPath: '/buildings/$buildingId/config'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -638,22 +818,43 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
+  AuthenticatedSignalsAiOutputRoute: typeof AuthenticatedSignalsAiOutputRoute
+  AuthenticatedSignalsExportRoute: typeof AuthenticatedSignalsExportRoute
+  AuthenticatedSignalsViewerRoute: typeof AuthenticatedSignalsViewerRoute
+  AuthenticatedUsersBuildingIdRoute: typeof AuthenticatedUsersBuildingIdRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
+  AuthenticatedComfortScheduleIndexRoute: typeof AuthenticatedComfortScheduleIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
+  AuthenticatedMaintenanceIndexRoute: typeof AuthenticatedMaintenanceIndexRoute
+  AuthenticatedProcessViewerIndexRoute: typeof AuthenticatedProcessViewerIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
+  AuthenticatedBuildingsBuildingIdConfigRoute: typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  AuthenticatedAnalysisAiOnVsOffIndexRoute: typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSettingsRouteRoute: AuthenticatedSettingsRouteRouteWithChildren,
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
+  AuthenticatedSignalsAiOutputRoute: AuthenticatedSignalsAiOutputRoute,
+  AuthenticatedSignalsExportRoute: AuthenticatedSignalsExportRoute,
+  AuthenticatedSignalsViewerRoute: AuthenticatedSignalsViewerRoute,
+  AuthenticatedUsersBuildingIdRoute: AuthenticatedUsersBuildingIdRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
+  AuthenticatedComfortScheduleIndexRoute:
+    AuthenticatedComfortScheduleIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
+  AuthenticatedMaintenanceIndexRoute: AuthenticatedMaintenanceIndexRoute,
+  AuthenticatedProcessViewerIndexRoute: AuthenticatedProcessViewerIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
+  AuthenticatedBuildingsBuildingIdConfigRoute:
+    AuthenticatedBuildingsBuildingIdConfigRoute,
+  AuthenticatedAnalysisAiOnVsOffIndexRoute:
+    AuthenticatedAnalysisAiOnVsOffIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

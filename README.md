@@ -1,25 +1,24 @@
-# Shadcn Admin Dashboard
+# HVAC AI Backoffice
 
-Admin Dashboard UI crafted with Shadcn and Vite. Built with responsiveness and accessibility in mind.
+A comprehensive backoffice system for managing AI-controlled HVAC systems across multiple buildings. Built with responsiveness and accessibility in mind.
 
-![alt text](public/images/shadcn-admin.png)
+![HVAC AI Backoffice](public/images/shadcn-admin.png)
 
-[![Sponsored by Clerk](https://img.shields.io/badge/Sponsored%20by-Clerk-5b6ee1?logo=clerk)](https://go.clerk.com/GttUAaK)
-
-I've been creating dashboard UIs at work and for my personal projects. I always wanted to make a reusable collection of dashboard UI for future projects; and here it is now. While I've created a few custom components, some of the code is directly adapted from ShadcnUI examples.
-
-> This is not a starter project (template) though. I'll probably make one in the future.
+This system enables operators to monitor and configure AI-driven HVAC systems, manage multiple buildings, track energy consumption, set temperature schedules, and receive real-time alerts for system issues.
 
 ## Features
 
-- Light/dark mode
-- Responsive
-- Accessible
-- With built-in Sidebar component
+- **Building Management**: Monitor and control multiple buildings from a single dashboard
+- **AI Configuration**: Configure AI models and parameters for optimal HVAC performance
+- **Real-time Monitoring**: Track temperature, humidity, energy consumption, and system status
+- **Alert System**: Receive and manage maintenance alerts and system notifications
+- **Energy Analytics**: Visualize energy consumption patterns and optimization opportunities
+- **Schedule Management**: Create and manage temperature schedules and automation rules
+- **User Management**: Manage operators and their building access permissions
+- Light/dark mode support
+- Fully responsive design
+- Accessible UI components
 - Global search command
-- 10+ pages
-- Extra custom components
-- RTL support
 
 <details>
 <summary>Customized Components (click to expand)</summary>
@@ -79,13 +78,13 @@ If you want to update components using the Shadcn CLI (e.g., `npx shadcn@latest 
 Clone the project
 
 ```bash
-  git clone https://github.com/satnaing/shadcn-admin.git
+  git clone https://github.com/yourusername/hvac-ai-backoffice.git
 ```
 
 Go to the project directory
 
 ```bash
-  cd shadcn-admin
+  cd hvac-ai-backoffice
 ```
 
 Install dependencies
@@ -100,19 +99,17 @@ Start the server
   pnpm run dev
 ```
 
-## Sponsoring this project ❤️
+## Use Cases
 
-If you find this project helpful or use this in your own work, consider [sponsoring me](https://github.com/sponsors/satnaing) to support development and maintenance. You can [buy me a coffee](https://buymeacoffee.com/satnaing) as well. Don’t worry, every penny helps. Thank you! 🙏
+- **Multi-Building Management**: Perfect for facility managers overseeing HVAC systems across multiple properties
+- **Energy Optimization**: Monitor and optimize energy consumption using AI-driven insights
+- **Predictive Maintenance**: Track system performance and receive alerts before issues occur
+- **Compliance Tracking**: Maintain records of temperature settings and system operations
+- **Remote Operations**: Configure and monitor HVAC systems from anywhere
 
-For questions or sponsorship inquiries, feel free to reach out at [satnaingdev@gmail.com](mailto:satnaingdev@gmail.com).
+## Architecture
 
-### Current Sponsor
-
-- [Clerk](https://go.clerk.com/GttUAaK) - authentication and user management for the modern web
-
-## Author
-
-Crafted with 🤍 by [@satnaing](https://github.com/satnaing)
+This boilerplate is built on the foundation of [shadcn-admin](https://github.com/satnaing/shadcn-admin) by [@satnaing](https://github.com/satnaing) and adapted for HVAC AI management.
 
 ## License
 

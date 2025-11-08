@@ -4,9 +4,8 @@ import { AccountForm } from './account-form'
 export function SettingsAccount() {
   return (
     <ContentSection
-      title='Account'
-      desc='Update your account settings. Set your preferred language and
-          timezone.'
+      title='AI Configuration'
+      desc='Configure AI model parameters and optimization preferences for your HVAC systems.'
     >
       <AccountForm />
     </ContentSection>

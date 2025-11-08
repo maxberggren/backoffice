@@ -1,32 +1,41 @@
 import { z } from 'zod'
 
-const userStatusSchema = z.union([
-  z.literal('active'),
-  z.literal('inactive'),
-  z.literal('invited'),
-  z.literal('suspended'),
+const buildingStatusSchema = z.union([
+  z.literal('operational'),
+  z.literal('maintenance'),
+  z.literal('offline'),
+  z.literal('warning'),
 ])
-export type UserStatus = z.infer<typeof userStatusSchema>
+export type BuildingStatus = z.infer<typeof buildingStatusSchema>
 
-const userRoleSchema = z.union([
-  z.literal('superadmin'),
-  z.literal('admin'),
-  z.literal('cashier'),
-  z.literal('manager'),
+const buildingTypeSchema = z.union([
+  z.literal('office'),
+  z.literal('residential'),
+  z.literal('retail'),
+  z.literal('industrial'),
 ])
 
-const userSchema = z.object({
+const buildingSchema = z.object({
   id: z.string(),
-  firstName: z.string(),
-  lastName: z.string(),
-  username: z.string(),
-  email: z.string(),
-  phoneNumber: z.string(),
-  status: userStatusSchema,
-  role: userRoleSchema,
+  name: z.string(),
+  address: z.string(),
+  city: z.string(),
+  company: z.string(),
+  type: buildingTypeSchema,
+  status: buildingStatusSchema,
+  temperature: z.number(),
+  targetTemperature: z.number(),
+  humidity: z.number(),
+  energyUsage: z.number(),
+  floors: z.number(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
-export type User = z.infer<typeof userSchema>
+export type Building = z.infer<typeof buildingSchema>
 
-export const userListSchema = z.array(userSchema)
+export const buildingListSchema = z.array(buildingSchema)
+
+// Keep old exports for backward compatibility during transition
+export type UserStatus = BuildingStatus
+export type User = Building
+export const userListSchema = buildingListSchema
