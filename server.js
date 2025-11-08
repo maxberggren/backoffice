@@ -1,5 +1,5 @@
 import { createServer } from 'http'
-import { existsSync } from 'fs'
+import { existsSync, readdirSync } from 'fs'
 import { fileURLToPath } from 'url'
 import { dirname, join, extname } from 'path'
 import { createReadStream } from 'fs'
@@ -10,9 +10,28 @@ const __dirname = dirname(__filename)
 const PORT = process.env.PORT || 3000
 const distDir = join(__dirname, 'dist')
 
+// Verify dist directory exists
+if (!existsSync(distDir)) {
+  console.error(`❌ Error: dist directory not found at ${distDir}`)
+  console.error('   Make sure you run "pnpm run build" before starting the server')
+  process.exit(1)
+}
+
+console.log(`✅ Found dist directory at ${distDir}`)
+
+// Verify index.html exists
+const indexPath = join(distDir, 'index.html')
+if (!existsSync(indexPath)) {
+  console.error(`❌ Error: index.html not found at ${indexPath}`)
+  process.exit(1)
+}
+
+console.log(`✅ Found index.html`)
+
 const MIME_TYPES = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
+  '.mjs': 'application/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',
   '.json': 'application/json; charset=utf-8',
   '.png': 'image/png',
@@ -40,7 +59,13 @@ function serveFile(res, filePath) {
 
   try {
     const mimeType = getMimeType(filePath)
-    res.setHeader('Content-Type', mimeType)
+    
+    // Ensure JavaScript files get the correct MIME type
+    if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
+      res.setHeader('Content-Type', 'application/javascript; charset=utf-8')
+    } else {
+      res.setHeader('Content-Type', mimeType)
+    }
     
     // Add cache headers for assets
     if (filePath.includes('/assets/')) {
@@ -48,9 +73,12 @@ function serveFile(res, filePath) {
     }
     
     const stream = createReadStream(filePath)
-    stream.on('error', () => {
-      res.statusCode = 500
-      res.end('Internal Server Error')
+    stream.on('error', (err) => {
+      console.error('Stream error:', err)
+      if (!res.headersSent) {
+        res.statusCode = 500
+        res.end('Internal Server Error')
+      }
     })
     stream.pipe(res)
     return true
@@ -66,6 +94,19 @@ const server = createServer((req, res) => {
   
   let path = req.url.split('?')[0] // Remove query string
   
+  // Health check endpoint
+  if (path === '/health' || path === '/healthz') {
+    res.statusCode = 200
+    res.setHeader('Content-Type', 'application/json')
+    res.end(JSON.stringify({ status: 'ok', distDir, port: PORT }))
+    return
+  }
+  
+  // Log requests in development/debug mode
+  if (process.env.NODE_ENV !== 'production' || process.env.DEBUG) {
+    console.log(`${req.method} ${path}`)
+  }
+  
   // Default to index.html
   if (path === '/' || path === '') {
     path = '/index.html'
@@ -73,6 +114,13 @@ const server = createServer((req, res) => {
   
   // Try to serve the requested file
   const filePath = join(distDir, path)
+  
+  // Security: prevent directory traversal
+  if (!filePath.startsWith(distDir)) {
+    res.statusCode = 403
+    res.end('Forbidden')
+    return
+  }
   
   if (serveFile(res, filePath)) {
     return
@@ -86,6 +134,11 @@ const server = createServer((req, res) => {
     if (serveFile(res, indexPath)) {
       return
     }
+  }
+  
+  // Log 404s for debugging
+  if (process.env.DEBUG) {
+    console.log(`⚠️  404: ${path} (file not found: ${filePath})`)
   }
   
   // 404
@@ -102,7 +155,18 @@ server.on('error', (error) => {
 server.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 Server running on port ${PORT}`)
   console.log(`📁 Serving files from ${distDir}`)
-  console.log(`🌐 Open http://localhost:${PORT} to view the app`)
+  console.log(`🌐 Health check: http://localhost:${PORT}/health`)
+  console.log(`🌐 App: http://localhost:${PORT}`)
+  
+  // List some files in dist for debugging
+  if (process.env.DEBUG) {
+    try {
+      const files = readdirSync(distDir)
+      console.log(`📦 Files in dist: ${files.slice(0, 10).join(', ')}...`)
+    } catch (e) {
+      // Ignore
+    }
+  }
 })
 
 
