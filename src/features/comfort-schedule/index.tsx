@@ -8,7 +8,6 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { ConfigDrawer } from '@/components/config-drawer'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -57,7 +56,7 @@ import type {
   DayOfWeek,
 } from './data/schema'
 import { scheduleIntervalSchema } from './data/schema'
-import { defaultSchedule, getCO2Level } from './data/schedule'
+import { defaultSchedule, getCO2Level, mockAHUs } from './data/schedule'
 
 const DAYS_OF_WEEK: DayOfWeek[] = [
   'monday',
@@ -166,7 +165,12 @@ function generateAutomaticIntervals(): ScheduleInterval[] {
 }
 
 export function ComfortSchedule() {
-  const [schedule, setSchedule] = useState<ComfortSchedule>(defaultSchedule)
+  // Manage schedules: one for "all AHUs" and one per individual AHU
+  const [schedules, setSchedules] = useState<Map<string | 'all', ComfortSchedule>>(
+    new Map([['all', defaultSchedule]])
+  )
+  const [isAllAHUsMode, setIsAllAHUsMode] = useState<boolean>(true)
+  const [selectedIndividualAHU, setSelectedIndividualAHU] = useState<string | null>(null)
   const [selectedInterval, setSelectedInterval] = useState<ScheduleInterval | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [draggedInterval, setDraggedInterval] = useState<ScheduleInterval | null>(null)
@@ -177,6 +181,55 @@ export function ComfortSchedule() {
   const [dragStartX, setDragStartX] = useState<number>(0)
   const [dragStartMinutes, setDragStartMinutes] = useState<number>(0)
   const [hasDragged, setHasDragged] = useState<boolean>(false)
+
+  // Determine current selected AHU based on mode
+  const selectedAHU = isAllAHUsMode ? 'all' : (selectedIndividualAHU || 'none')
+
+  // Get current schedule based on selected AHU
+  const schedule = schedules.get(selectedAHU) || (selectedAHU === 'none' ? null : defaultSchedule)
+  const hasSchedule = schedule !== null
+
+  // Update current schedule
+  const updateSchedule = useCallback((updates: Partial<ComfortSchedule>) => {
+    setSchedules((prev) => {
+      const newMap = new Map(prev)
+      const currentAHU = isAllAHUsMode ? 'all' : (selectedIndividualAHU || 'none')
+      if (currentAHU === 'none') return newMap // Can't update if no AHU selected
+      const current = newMap.get(currentAHU) || { ...defaultSchedule, ahuId: currentAHU === 'all' ? undefined : currentAHU }
+      newMap.set(currentAHU, { ...current, ...updates })
+      return newMap
+    })
+  }, [isAllAHUsMode, selectedIndividualAHU])
+
+  // Handle mode switch change
+  const handleModeSwitchChange = (checked: boolean) => {
+    setIsAllAHUsMode(checked)
+    // When switching to individual mode, don't auto-select an AHU
+    // User must explicitly select one or leave it unselected
+  }
+
+  // Handle individual AHU selection change
+  const handleIndividualAHUChange = (ahuId: string | 'none') => {
+    if (ahuId === 'none') {
+      setSelectedIndividualAHU(null)
+      return
+    }
+    setSelectedIndividualAHU(ahuId)
+    // Create a new schedule for this AHU if it doesn't exist
+    if (!schedules.has(ahuId)) {
+      const newSchedule: ComfortSchedule = {
+        ...defaultSchedule,
+        id: `schedule-${ahuId}`,
+        name: 'Non-office hours',
+        ahuId: ahuId,
+      }
+      setSchedules((prev) => {
+        const newMap = new Map(prev)
+        newMap.set(ahuId, newSchedule)
+        return newMap
+      })
+    }
+  }
 
   const form = useForm<ScheduleInterval>({
     resolver: zodResolver(scheduleIntervalSchema),
@@ -194,37 +247,41 @@ export function ComfortSchedule() {
 
   const scheduleForm = useForm<{
     name: string
-    fromDate: Date
-    toDate: Date
     isActive: boolean
   }>({
     defaultValues: {
-      name: schedule.name,
-      fromDate: schedule.fromDate,
-      toDate: schedule.toDate,
-      isActive: schedule.isActive,
+      name: schedule?.name || 'Non-office hours',
+      isActive: schedule?.isActive || false,
     },
   })
 
+  // Update form when schedule changes
+  React.useEffect(() => {
+    if (schedule) {
+      scheduleForm.reset({
+        name: schedule.name,
+        isActive: schedule.isActive,
+      })
+    }
+  }, [schedule, scheduleForm])
+
   // Update intervals when mode changes
   const handleModeChange = (mode: OperatingMode) => {
+    if (!hasSchedule) return
     if (mode === 'automatic') {
-      setSchedule({
-        ...schedule,
+      updateSchedule({
         mode,
         intervals: generateAutomaticIntervals(),
       })
       toast.success('Switched to Automatic mode')
     } else if (mode === 'off') {
-      setSchedule({
-        ...schedule,
+      updateSchedule({
         mode,
         intervals: [],
       })
-      toast.success('Comfort schedule disabled')
+      toast.success('AHU schedule disabled')
     } else {
-      setSchedule({
-        ...schedule,
+      updateSchedule({
         mode,
       })
       toast.success('Switched to Manual mode')
@@ -232,6 +289,7 @@ export function ComfortSchedule() {
   }
 
   const handleAddInterval = () => {
+    if (!hasSchedule) return
     form.reset({
       id: `interval-${Date.now()}`,
       day: 'monday',
@@ -247,38 +305,36 @@ export function ComfortSchedule() {
   }
 
   const handleEditInterval = (interval: ScheduleInterval) => {
+    if (!hasSchedule) return
     form.reset(interval)
     setSelectedInterval(interval)
     setIsFormOpen(true)
   }
 
   const handleDeleteInterval = () => {
-    if (selectedInterval) {
-      setSchedule({
-        ...schedule,
-        intervals: schedule.intervals.filter((i) => i.id !== selectedInterval.id),
-      })
-      toast.success('Interval deleted')
-      setIsFormOpen(false)
-      setSelectedInterval(null)
-    }
+    if (!hasSchedule || !selectedInterval) return
+    updateSchedule({
+      intervals: schedule!.intervals.filter((i) => i.id !== selectedInterval.id),
+    })
+    toast.success('Interval deleted')
+    setIsFormOpen(false)
+    setSelectedInterval(null)
   }
 
   const handleSubmitInterval = (data: ScheduleInterval) => {
+    if (!hasSchedule) return
     if (selectedInterval) {
       // Update existing
-      setSchedule({
-        ...schedule,
-        intervals: schedule.intervals.map((i) =>
+      updateSchedule({
+        intervals: schedule!.intervals.map((i) =>
           i.id === selectedInterval.id ? data : i
         ),
       })
       toast.success('Interval updated')
     } else {
       // Add new
-      setSchedule({
-        ...schedule,
-        intervals: [...schedule.intervals, data],
+      updateSchedule({
+        intervals: [...schedule!.intervals, data],
       })
       toast.success('Interval added')
     }
@@ -288,14 +344,9 @@ export function ComfortSchedule() {
 
   const handleScheduleSubmit = (data: {
     name: string
-    fromDate: Date
-    toDate: Date
     isActive: boolean
   }) => {
-    setSchedule({
-      ...schedule,
-      ...data,
-    })
+    updateSchedule(data)
     toast.success('Schedule updated')
   }
 
@@ -474,9 +525,8 @@ export function ComfortSchedule() {
         const newDurationHours = Math.floor(newDurationMinutes / 60)
         const newDurationMins = newDurationMinutes % 60
         
-        setSchedule((prevSchedule) => ({
-          ...prevSchedule,
-          intervals: prevSchedule.intervals.map((i) =>
+        updateSchedule({
+          intervals: schedule!.intervals.map((i) =>
             i.id === interval.id
               ? {
                   ...i,
@@ -486,16 +536,15 @@ export function ComfortSchedule() {
                 }
               : i
           ),
-        }))
+        })
         toast.success('Interval resized')
       } else {
         const newDurationMinutes = Math.max(15, Math.min(24 * 60 - timeToMinutes(interval.startTime), resizeStartMinutes + deltaMinutes))
         const newDurationHours = Math.floor(newDurationMinutes / 60)
         const newDurationMins = newDurationMinutes % 60
         
-        setSchedule((prevSchedule) => ({
-          ...prevSchedule,
-          intervals: prevSchedule.intervals.map((i) =>
+        updateSchedule({
+          intervals: schedule.intervals.map((i) =>
             i.id === interval.id
               ? {
                   ...i,
@@ -504,7 +553,7 @@ export function ComfortSchedule() {
                 }
               : i
           ),
-        }))
+        })
         toast.success('Interval resized')
       }
     } else {
@@ -516,9 +565,8 @@ export function ComfortSchedule() {
       const clampedMinutes = Math.max(0, Math.min(snappedMinutes, 24 * 60 - durationMinutes))
       const newStartTime = minutesToTime(clampedMinutes)
       
-      setSchedule((prevSchedule) => ({
-        ...prevSchedule,
-        intervals: prevSchedule.intervals.map((i) =>
+      updateSchedule({
+        intervals: schedule.intervals.map((i) =>
           i.id === interval.id
             ? {
                 ...i,
@@ -526,7 +574,7 @@ export function ComfortSchedule() {
               }
             : i
         ),
-      }))
+      })
       toast.success('Interval moved')
     }
     
@@ -539,7 +587,7 @@ export function ComfortSchedule() {
     setTimeout(() => {
       setHasDragged(false)
     }, 0)
-  }, [draggedInterval, dragOffset, resizeHandle, resizeStartMinutes, dragStartMinutes])
+  }, [draggedInterval, dragOffset, resizeHandle, resizeStartMinutes, dragStartMinutes, schedule, updateSchedule, isAllAHUsMode, selectedIndividualAHU])
 
   // Set up global mouse event listeners
   React.useEffect(() => {
@@ -553,14 +601,13 @@ export function ComfortSchedule() {
     }
   }, [draggedInterval, handleMouseMove, handleMouseUp])
 
-  const isDisabled = schedule.mode !== 'manual'
+  const isDisabled = !hasSchedule || schedule?.mode !== 'manual'
 
   return (
     <>
       <Header fixed>
         <div className='ms-auto flex items-center space-x-4'>
           <ThemeSwitch />
-          <ConfigDrawer />
           <ProfileDropdown />
         </div>
       </Header>
@@ -573,136 +620,91 @@ export function ComfortSchedule() {
               <Thermometer className='h-5 w-5 text-primary' />
             </div>
             <div>
-              <h2 className='text-2xl font-bold tracking-tight'>Comfort Schedule</h2>
+              <h2 className='text-2xl font-bold tracking-tight'>AHU Schedule</h2>
               <p className='text-muted-foreground text-sm'>
-                Manage HVAC comfort settings for non-occupied hours
+                Manage AHU schedules for individual units or all units
               </p>
             </div>
           </div>
 
-          {/* Schedule Info Form */}
+          {/* Timeline */}
           <Card>
             <CardHeader>
-              <CardTitle>Schedule Configuration</CardTitle>
-              <CardDescription>
-                Configure schedule name, date range, and operating mode
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...scheduleForm}>
-                <form
-                  onSubmit={scheduleForm.handleSubmit(handleScheduleSubmit)}
-                  className='space-y-4'
-                >
-                  <div className='grid gap-4 sm:grid-cols-2'>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <CardTitle>Weekly Schedule Timeline</CardTitle>
+                  <CardDescription>
+                    24-hour grid showing schedule intervals for each day of the week
+                  </CardDescription>
+                </div>
+                {hasSchedule && schedule.mode === 'manual' && (
+                  <Button onClick={handleAddInterval} disabled={isDisabled}>
+                    <Plus className='mr-2 h-4 w-4' />
+                    Add Interval
+                  </Button>
+                )}
+              </div>
+              <div className='mt-4 flex flex-wrap items-center gap-4 pt-4 border-t'>
+                <Form {...scheduleForm}>
+                  <form
+                    onSubmit={scheduleForm.handleSubmit(handleScheduleSubmit)}
+                    className='flex flex-wrap items-center gap-4'
+                  >
                     <FormField
                       control={scheduleForm.control}
                       name='name'
                       render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Schedule Name</FormLabel>
+                        <FormItem className='m-0'>
                           <FormControl>
-                            <Input placeholder='e.g., Emporio opening hours' {...field} />
+                            <Input 
+                              placeholder='Schedule name' 
+                              {...field} 
+                              disabled={!hasSchedule}
+                              className='h-9 w-[180px]'
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
+                    <div className='flex items-center gap-2'>
+                      <span className='text-sm font-medium'>All AHUs</span>
+                      <Switch
+                        checked={isAllAHUsMode}
+                        onCheckedChange={handleModeSwitchChange}
+                      />
+                    </div>
+                    {!isAllAHUsMode && (
+                      <Select
+                        value={selectedIndividualAHU || 'none'}
+                        onValueChange={(value) => handleIndividualAHUChange(value as string | 'none')}
+                      >
+                        <SelectTrigger className='h-9 w-[200px]'>
+                          <SelectValue placeholder='Select AHU' />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value='none'>None (No Schedule)</SelectItem>
+                          {mockAHUs.map((ahu) => (
+                            <SelectItem key={ahu.id} value={ahu.id}>
+                              {ahu.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
                     <FormField
                       control={scheduleForm.control}
                       name='isActive'
                       render={({ field }) => (
-                        <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
-                          <div className='space-y-0.5'>
-                            <FormLabel className='text-base'>Active Status</FormLabel>
-                            <div className='text-muted-foreground text-sm'>
-                              Enable or disable this schedule
-                            </div>
-                          </div>
+                        <FormItem className='flex items-center gap-2 m-0'>
+                          <FormLabel className='text-sm font-medium m-0'>Active</FormLabel>
                           <FormControl>
                             <Switch
                               checked={field.value}
                               onCheckedChange={field.onChange}
+                              disabled={!hasSchedule}
                             />
                           </FormControl>
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  <div className='grid gap-4 sm:grid-cols-3'>
-                    <FormField
-                      control={scheduleForm.control}
-                      name='fromDate'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                          <FormLabel>From Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant='outline'
-                                  className={cn(
-                                    'w-full pl-3 text-left font-normal',
-                                    !field.value && 'text-muted-foreground'
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, 'yyyy-MM-dd')
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-auto p-0' align='start'>
-                              <Calendar
-                                mode='single'
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={scheduleForm.control}
-                      name='toDate'
-                      render={({ field }) => (
-                        <FormItem className='flex flex-col'>
-                          <FormLabel>To Date</FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant='outline'
-                                  className={cn(
-                                    'w-full pl-3 text-left font-normal',
-                                    !field.value && 'text-muted-foreground'
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(field.value, 'yyyy-MM-dd')
-                                  ) : (
-                                    <span>Pick a date</span>
-                                  )}
-                                  <CalendarIcon className='ml-auto h-4 w-4 opacity-50' />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent className='w-auto p-0' align='start'>
-                              <Calendar
-                                mode='single'
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
                         </FormItem>
                       )}
                     />
@@ -710,16 +712,16 @@ export function ComfortSchedule() {
                       control={scheduleForm.control}
                       name='isActive'
                       render={() => (
-                        <FormItem>
-                          <FormLabel>Operating Mode</FormLabel>
+                        <FormItem className='m-0'>
                           <Select
-                            value={schedule.mode}
+                            value={schedule?.mode || 'off'}
                             onValueChange={(value) =>
                               handleModeChange(value as OperatingMode)
                             }
+                            disabled={!hasSchedule}
                           >
                             <FormControl>
-                              <SelectTrigger>
+                              <SelectTrigger className='h-9 w-[140px]'>
                                 <SelectValue />
                               </SelectTrigger>
                             </FormControl>
@@ -733,56 +735,8 @@ export function ComfortSchedule() {
                         </FormItem>
                       )}
                     />
-                  </div>
-                  <div className='flex justify-end'>
-                    <Button type='submit'>Update Schedule</Button>
-                  </div>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-
-          {/* Mode Info */}
-          <Card>
-            <CardContent className='pt-6'>
-              <div className='text-muted-foreground text-sm'>
-                {schedule.mode === 'manual' && (
-                  <p>
-                    Manual Mode: Full control to create and customize schedule intervals.
-                    Use the timeline below to add, edit, and manage intervals.
-                  </p>
-                )}
-                {schedule.mode === 'automatic' && (
-                  <p>
-                    Automatic Mode: Using predefined 8:00-17:00 weekday schedule with
-                    reduced settings for nights/weekends. Timeline is read-only.
-                  </p>
-                )}
-                {schedule.mode === 'off' && (
-                  <p>
-                    Off Mode: Comfort schedule is completely disabled. No intervals are active.
-                  </p>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Timeline */}
-          <Card>
-            <CardHeader>
-              <div className='flex items-center justify-between'>
-                <div>
-                  <CardTitle>Weekly Schedule Timeline</CardTitle>
-                  <CardDescription>
-                    24-hour grid showing schedule intervals for each day of the week
-                  </CardDescription>
-                </div>
-                {schedule.mode === 'manual' && (
-                  <Button onClick={handleAddInterval} disabled={isDisabled}>
-                    <Plus className='mr-2 h-4 w-4' />
-                    Add Interval
-                  </Button>
-                )}
+                  </form>
+                </Form>
               </div>
             </CardHeader>
             <CardContent>
@@ -805,111 +759,122 @@ export function ComfortSchedule() {
                   </div>
 
                   {/* Days and Timeline */}
-                  {DAYS_OF_WEEK.map((day) => {
-                    const dayIntervals = getIntervalsForDay(schedule.intervals, day)
-                    return (
-                      <div
-                        key={day}
-                        className='relative mb-2 flex min-h-[80px] border-b last:border-b-0'
-                      >
-                        {/* Day Label */}
-                        <div className='w-32 flex-shrink-0 py-2 font-medium'>
-                          {DAY_LABELS[day]}
-                        </div>
+                  {hasSchedule ? (
+                    DAYS_OF_WEEK.map((day) => {
+                      const dayIntervals = getIntervalsForDay(schedule!.intervals, day)
+                      return (
+                       <div
+                         key={day}
+                         className='relative mb-2 flex min-h-[80px] border-b last:border-b-0'
+                       >
+                         {/* Day Label */}
+                         <div className='w-32 flex-shrink-0 py-2 font-medium'>
+                           {DAY_LABELS[day]}
+                         </div>
 
-                        {/* Timeline Area */}
-                        <div className='relative flex-1 py-2' data-timeline>
-                          {/* CO2 Background Visualization */}
-                          <div className='absolute inset-0 flex gap-0.5 px-0.5'>
-                            {HOURS.map((hour) => {
-                              const co2Level = getCO2Level(day, hour)
-                              const height = Math.min((co2Level / 1200) * 100, 100)
-                              return (
-                                <div
-                                  key={hour}
-                                  className='flex-1 rounded-sm'
-                                  style={{
-                                    background: `linear-gradient(to top, rgba(128, 128, 128, 0.25) ${height}%, transparent ${height}%)`,
-                                  }}
-                                />
-                              )
-                            })}
-                          </div>
+                         {/* Timeline Area */}
+                         <div className='relative flex-1 py-2' data-timeline>
+                           {/* CO2 Background Visualization */}
+                           <div className='absolute inset-0 flex gap-0.5 px-0.5'>
+                             {HOURS.map((hour) => {
+                               const co2Level = getCO2Level(day, hour)
+                               const height = Math.min((co2Level / 1200) * 100, 100)
+                               return (
+                                 <div
+                                   key={hour}
+                                   className='flex-1 rounded-sm'
+                                   style={{
+                                     background: `linear-gradient(to top, rgba(128, 128, 128, 0.25) ${height}%, transparent ${height}%)`,
+                                   }}
+                                 />
+                               )
+                             })}
+                           </div>
 
-                          {/* Hour Grid Lines */}
-                          <div className='absolute inset-0 flex'>
-                            {HOURS.map((hour) => (
-                              <div
-                                key={hour}
-                                className='flex-1 border-r border-dashed border-muted last:border-r-0'
-                              />
-                            ))}
-                          </div>
+                           {/* Hour Grid Lines */}
+                           <div className='absolute inset-0 flex'>
+                             {HOURS.map((hour) => (
+                               <div
+                                 key={hour}
+                                 className='flex-1 border-r border-dashed border-muted last:border-r-0'
+                               />
+                             ))}
+                           </div>
 
-                          {/* Schedule Blocks */}
-                          {dayIntervals.map((interval) => {
-                            const style = getBlockStyle(interval)
-                            const isSelected = selectedInterval?.id === interval.id
-                            const isDragging = draggedInterval?.id === interval.id
-                            return (
-                              <div
-                                key={interval.id}
-                                className={cn(
-                                  'group absolute top-1 bottom-1 rounded border-2 transition-all',
-                                  isSelected || isDragging
-                                    ? 'border-primary bg-primary/20 z-10'
-                                    : 'border-primary/50 bg-primary/10 hover:bg-primary/15',
-                                  isDisabled && 'cursor-not-allowed opacity-50',
-                                  !isDisabled && 'cursor-move'
-                                )}
-                                style={style}
-                                onMouseDown={(e) => !isDisabled && handleBlockMouseDown(e, interval)}
-                                onClick={(e) => {
-                                  if (!isDisabled && !hasDragged) {
-                                    e.stopPropagation()
-                                    handleEditInterval(interval)
-                                  }
-                                }}
-                              >
-                                {/* Left Resize Handle */}
-                                {!isDisabled && (
-                                  <div
-                                    className='absolute left-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
-                                    onMouseDown={(e) => handleResizeMouseDown(e, interval, 'left')}
-                                  />
-                                )}
-                                {/* Right Resize Handle */}
-                                {!isDisabled && (
-                                  <div
-                                    className='absolute right-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
-                                    onMouseDown={(e) => handleResizeMouseDown(e, interval, 'right')}
-                                  />
-                                )}
-                                <div className='flex h-full flex-col justify-between gap-0.5 p-1 text-xs'>
-                                  <div className='font-medium'>
-                                    {(() => {
-                                      const displayedTime = getDisplayedTime(interval)
-                                      return `${displayedTime.startTime} - ${displayedTime.endTime}`
-                                    })()}
-                                  </div>
-                                  <div className='flex flex-col gap-0.5 text-[10px] leading-tight'>
-                                    <div className='text-muted-foreground'>
-                                      Lower: {interval.temperatureLowering}°C
-                                    </div>
-                                    <div className='flex items-center gap-1.5 text-muted-foreground/80'>
-                                      <span>AHU: {interval.ahuPressure}%</span>
-                                      <span>•</span>
-                                      <span>{interval.ahuTemperature}°C</span>
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
+                           {/* Schedule Blocks */}
+                           {dayIntervals.map((interval) => {
+                             const style = getBlockStyle(interval)
+                             const isSelected = selectedInterval?.id === interval.id
+                             const isDragging = draggedInterval?.id === interval.id
+                             return (
+                               <div
+                                 key={interval.id}
+                                 className={cn(
+                                   'group absolute top-1 bottom-1 rounded border-2 transition-all',
+                                   isSelected || isDragging
+                                     ? 'border-primary bg-primary/20 z-10'
+                                     : 'border-primary/50 bg-primary/10 hover:bg-primary/15',
+                                   isDisabled && 'cursor-not-allowed opacity-50',
+                                   !isDisabled && 'cursor-move'
+                                 )}
+                                 style={style}
+                                 onMouseDown={(e) => !isDisabled && handleBlockMouseDown(e, interval)}
+                                 onClick={(e) => {
+                                   if (!isDisabled && !hasDragged) {
+                                     e.stopPropagation()
+                                     handleEditInterval(interval)
+                                   }
+                                 }}
+                               >
+                                 {/* Left Resize Handle */}
+                                 {!isDisabled && (
+                                   <div
+                                     className='absolute left-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
+                                     onMouseDown={(e) => handleResizeMouseDown(e, interval, 'left')}
+                                   />
+                                 )}
+                                 {/* Right Resize Handle */}
+                                 {!isDisabled && (
+                                   <div
+                                     className='absolute right-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
+                                     onMouseDown={(e) => handleResizeMouseDown(e, interval, 'right')}
+                                   />
+                                 )}
+                                 <div className='flex h-full flex-col justify-between gap-0.5 p-1 text-xs'>
+                                   <div className='font-medium'>
+                                     {(() => {
+                                       const displayedTime = getDisplayedTime(interval)
+                                       return `${displayedTime.startTime} - ${displayedTime.endTime}`
+                                     })()}
+                                   </div>
+                                   <div className='flex flex-col gap-0.5 text-[10px] leading-tight'>
+                                     <div className='text-muted-foreground'>
+                                       Lower: {interval.temperatureLowering}°C
+                                     </div>
+                                     <div className='flex items-center gap-1.5 text-muted-foreground/80'>
+                                       <span>AHU: {interval.ahuPressure}%</span>
+                                       <span>•</span>
+                                       <span>{interval.ahuTemperature}°C</span>
+                                     </div>
+                                   </div>
+                                 </div>
+                               </div>
+                             )
+                           })}
+                         </div>
+                       </div>
+                     )
+                   })
+                  ) : (
+                    <div className='flex min-h-[400px] items-center justify-center text-muted-foreground'>
+                      <div className='text-center'>
+                        <p className='text-lg font-medium'>No Schedule Selected</p>
+                        <p className='text-sm mt-2'>
+                          Select an AHU from the dropdown above to manage its schedule.
+                        </p>
                       </div>
-                    )
-                  })}
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>

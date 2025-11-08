@@ -376,3 +376,4 @@ interface BuildingDetailValues {
 **Source:** Myrspoven Legacy Backoffice  
 **Status:** ✅ Complete and Ready for Backend Integration
 
+

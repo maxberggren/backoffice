@@ -26,6 +26,7 @@ import {
   Download,
   Sparkles,
   Table2,
+  Layers,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
@@ -104,6 +105,11 @@ export const sidebarData: SidebarData = {
           icon: TrendingUp,
         },
         {
+          title: 'Comfort Groups',
+          url: '/analysis/comfort-groups',
+          icon: Layers,
+        },
+        {
           title: 'Maintenance',
           url: '/maintenance',
           icon: Wrench,
@@ -120,8 +126,8 @@ export const sidebarData: SidebarData = {
           dynamicUrl: true,
         },
         {
-          title: 'Comfort Schedule',
-          url: '/comfort-schedule',
+          title: 'AHU Schedule',
+          url: '/ahu-schedule',
           icon: Calendar,
         },
       ],

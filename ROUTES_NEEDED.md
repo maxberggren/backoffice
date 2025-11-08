@@ -209,3 +209,4 @@ navigate({ search: { ...search, page: newPage } })
 
 **Note:** After creating these routes, run `pnpm dev` and test all navigation paths. The router will automatically pick up the new routes.
 
+

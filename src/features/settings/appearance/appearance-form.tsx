@@ -67,11 +67,17 @@ export function AppearanceForm() {
                     )}
                     {...field}
                   >
-                    {fonts.map((font) => (
-                      <option key={font} value={font}>
-                        {font}
-                      </option>
-                    ))}
+                    {fonts.map((font) => {
+                      const displayName = font
+                        .split('-')
+                        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                        .join(' ')
+                      return (
+                        <option key={font} value={font}>
+                          {displayName}
+                        </option>
+                      )
+                    })}
                   </select>
                 </FormControl>
                 <ChevronDownIcon className='absolute end-3 top-2.5 h-4 w-4 opacity-50' />

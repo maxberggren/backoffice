@@ -37,7 +37,16 @@ export const comfortScheduleSchema = z.object({
   isActive: z.boolean(),
   mode: operatingModeSchema,
   intervals: z.array(scheduleIntervalSchema),
+  ahuId: z.string().optional(), // undefined means "all AHUs", string means specific AHU
 })
 
 export type ComfortSchedule = z.infer<typeof comfortScheduleSchema>
+
+// Schema for managing multiple schedules (one per AHU or one for all)
+export const ahuScheduleManagerSchema = z.object({
+  schedules: z.array(comfortScheduleSchema),
+  defaultScheduleId: z.string().optional(), // ID of the "all AHUs" schedule
+})
+
+export type AHUScheduleManager = z.infer<typeof ahuScheduleManagerSchema>
 

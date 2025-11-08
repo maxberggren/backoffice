@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ChevronsUpDown, Building2 } from 'lucide-react'
+import { ChevronsUpDown } from 'lucide-react'
 import {
   Popover,
   PopoverContent,
@@ -48,8 +48,12 @@ export function BuildingSwitcher({ buildings }: BuildingSwitcherProps) {
               size='lg'
               className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
             >
-              <div className='bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg'>
-                <Building2 className='size-4' />
+              <div className='flex aspect-square size-9 items-center justify-center rounded-lg overflow-hidden'>
+                <img 
+                  src='/images/bird.png' 
+                  alt='Myrspoven Logo' 
+                  className='size-[108%] object-cover invert dark:invert-0'
+                />
               </div>
               <div className='grid flex-1 text-start text-sm leading-tight'>
                 <span className='truncate font-semibold'>Myrspoven</span>

@@ -31,9 +31,9 @@ import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authen
 import { Route as AuthenticatedProcessViewerIndexRouteImport } from './routes/_authenticated/process-viewer/index'
 import { Route as AuthenticatedMaintenanceIndexRouteImport } from './routes/_authenticated/maintenance/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
-import { Route as AuthenticatedComfortScheduleIndexRouteImport } from './routes/_authenticated/comfort-schedule/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
+import { Route as AuthenticatedAhuScheduleIndexRouteImport } from './routes/_authenticated/ahu-schedule/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
@@ -46,6 +46,7 @@ import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_auth
 import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_authenticated/settings/appearance'
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
+import { Route as AuthenticatedAnalysisComfortGroupsIndexRouteImport } from './routes/_authenticated/analysis/comfort-groups/index'
 import { Route as AuthenticatedAnalysisAiOnVsOffIndexRouteImport } from './routes/_authenticated/analysis/ai-on-vs-off/index'
 import { Route as AuthenticatedBuildingsBuildingIdConfigRouteImport } from './routes/_authenticated/buildings/$buildingId/config'
 
@@ -161,12 +162,6 @@ const AuthenticatedHelpCenterIndexRoute =
     path: '/help-center/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedComfortScheduleIndexRoute =
-  AuthenticatedComfortScheduleIndexRouteImport.update({
-    id: '/comfort-schedule/',
-    path: '/comfort-schedule/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedChatsIndexRoute = AuthenticatedChatsIndexRouteImport.update({
   id: '/chats/',
   path: '/chats/',
@@ -177,6 +172,12 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAhuScheduleIndexRoute =
+  AuthenticatedAhuScheduleIndexRouteImport.update({
+    id: '/ahu-schedule/',
+    path: '/ahu-schedule/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const ClerkAuthenticatedUserManagementRoute =
   ClerkAuthenticatedUserManagementRouteImport.update({
     id: '/user-management',
@@ -247,6 +248,12 @@ const AuthenticatedErrorsErrorRoute =
     path: '/errors/$error',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAnalysisComfortGroupsIndexRoute =
+  AuthenticatedAnalysisComfortGroupsIndexRouteImport.update({
+    id: '/analysis/comfort-groups/',
+    path: '/analysis/comfort-groups/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalysisAiOnVsOffIndexRoute =
   AuthenticatedAnalysisAiOnVsOffIndexRouteImport.update({
     id: '/analysis/ai-on-vs-off/',
@@ -287,9 +294,9 @@ export interface FileRoutesByFullPath {
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/ahu-schedule': typeof AuthenticatedAhuScheduleIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
-  '/comfort-schedule': typeof AuthenticatedComfortScheduleIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/maintenance': typeof AuthenticatedMaintenanceIndexRoute
   '/process-viewer': typeof AuthenticatedProcessViewerIndexRoute
@@ -298,6 +305,7 @@ export interface FileRoutesByFullPath {
   '/users': typeof AuthenticatedUsersIndexRoute
   '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
   '/analysis/ai-on-vs-off': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  '/analysis/comfort-groups': typeof AuthenticatedAnalysisComfortGroupsIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -324,9 +332,9 @@ export interface FileRoutesByTo {
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/ahu-schedule': typeof AuthenticatedAhuScheduleIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
-  '/comfort-schedule': typeof AuthenticatedComfortScheduleIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
   '/maintenance': typeof AuthenticatedMaintenanceIndexRoute
   '/process-viewer': typeof AuthenticatedProcessViewerIndexRoute
@@ -335,6 +343,7 @@ export interface FileRoutesByTo {
   '/users': typeof AuthenticatedUsersIndexRoute
   '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
   '/analysis/ai-on-vs-off': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  '/analysis/comfort-groups': typeof AuthenticatedAnalysisComfortGroupsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -366,9 +375,9 @@ export interface FileRoutesById {
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
+  '/_authenticated/ahu-schedule/': typeof AuthenticatedAhuScheduleIndexRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
-  '/_authenticated/comfort-schedule/': typeof AuthenticatedComfortScheduleIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
   '/_authenticated/maintenance/': typeof AuthenticatedMaintenanceIndexRoute
   '/_authenticated/process-viewer/': typeof AuthenticatedProcessViewerIndexRoute
@@ -377,6 +386,7 @@ export interface FileRoutesById {
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
   '/_authenticated/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
   '/_authenticated/analysis/ai-on-vs-off/': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  '/_authenticated/analysis/comfort-groups/': typeof AuthenticatedAnalysisComfortGroupsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -407,9 +417,9 @@ export interface FileRouteTypes {
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
+    | '/ahu-schedule'
     | '/apps'
     | '/chats'
-    | '/comfort-schedule'
     | '/help-center'
     | '/maintenance'
     | '/process-viewer'
@@ -418,6 +428,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/buildings/$buildingId/config'
     | '/analysis/ai-on-vs-off'
+    | '/analysis/comfort-groups'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -444,9 +455,9 @@ export interface FileRouteTypes {
     | '/clerk/sign-in'
     | '/clerk/sign-up'
     | '/clerk/user-management'
+    | '/ahu-schedule'
     | '/apps'
     | '/chats'
-    | '/comfort-schedule'
     | '/help-center'
     | '/maintenance'
     | '/process-viewer'
@@ -455,6 +466,7 @@ export interface FileRouteTypes {
     | '/users'
     | '/buildings/$buildingId/config'
     | '/analysis/ai-on-vs-off'
+    | '/analysis/comfort-groups'
   id:
     | '__root__'
     | '/_authenticated'
@@ -485,9 +497,9 @@ export interface FileRouteTypes {
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
+    | '/_authenticated/ahu-schedule/'
     | '/_authenticated/apps/'
     | '/_authenticated/chats/'
-    | '/_authenticated/comfort-schedule/'
     | '/_authenticated/help-center/'
     | '/_authenticated/maintenance/'
     | '/_authenticated/process-viewer/'
@@ -496,6 +508,7 @@ export interface FileRouteTypes {
     | '/_authenticated/users/'
     | '/_authenticated/buildings/$buildingId/config'
     | '/_authenticated/analysis/ai-on-vs-off/'
+    | '/_authenticated/analysis/comfort-groups/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -669,13 +682,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedHelpCenterIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/comfort-schedule/': {
-      id: '/_authenticated/comfort-schedule/'
-      path: '/comfort-schedule'
-      fullPath: '/comfort-schedule'
-      preLoaderRoute: typeof AuthenticatedComfortScheduleIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/chats/': {
       id: '/_authenticated/chats/'
       path: '/chats'
@@ -688,6 +694,13 @@ declare module '@tanstack/react-router' {
       path: '/apps'
       fullPath: '/apps'
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/ahu-schedule/': {
+      id: '/_authenticated/ahu-schedule/'
+      path: '/ahu-schedule'
+      fullPath: '/ahu-schedule'
+      preLoaderRoute: typeof AuthenticatedAhuScheduleIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/clerk/_authenticated/user-management': {
@@ -774,6 +787,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedErrorsErrorRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/analysis/comfort-groups/': {
+      id: '/_authenticated/analysis/comfort-groups/'
+      path: '/analysis/comfort-groups'
+      fullPath: '/analysis/comfort-groups'
+      preLoaderRoute: typeof AuthenticatedAnalysisComfortGroupsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analysis/ai-on-vs-off/': {
       id: '/_authenticated/analysis/ai-on-vs-off/'
       path: '/analysis/ai-on-vs-off'
@@ -822,9 +842,9 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSignalsExportRoute: typeof AuthenticatedSignalsExportRoute
   AuthenticatedSignalsViewerRoute: typeof AuthenticatedSignalsViewerRoute
   AuthenticatedUsersBuildingIdRoute: typeof AuthenticatedUsersBuildingIdRoute
+  AuthenticatedAhuScheduleIndexRoute: typeof AuthenticatedAhuScheduleIndexRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
-  AuthenticatedComfortScheduleIndexRoute: typeof AuthenticatedComfortScheduleIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
   AuthenticatedMaintenanceIndexRoute: typeof AuthenticatedMaintenanceIndexRoute
   AuthenticatedProcessViewerIndexRoute: typeof AuthenticatedProcessViewerIndexRoute
@@ -832,6 +852,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
   AuthenticatedBuildingsBuildingIdConfigRoute: typeof AuthenticatedBuildingsBuildingIdConfigRoute
   AuthenticatedAnalysisAiOnVsOffIndexRoute: typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  AuthenticatedAnalysisComfortGroupsIndexRoute: typeof AuthenticatedAnalysisComfortGroupsIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
@@ -842,10 +863,9 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSignalsExportRoute: AuthenticatedSignalsExportRoute,
   AuthenticatedSignalsViewerRoute: AuthenticatedSignalsViewerRoute,
   AuthenticatedUsersBuildingIdRoute: AuthenticatedUsersBuildingIdRoute,
+  AuthenticatedAhuScheduleIndexRoute: AuthenticatedAhuScheduleIndexRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
-  AuthenticatedComfortScheduleIndexRoute:
-    AuthenticatedComfortScheduleIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
   AuthenticatedMaintenanceIndexRoute: AuthenticatedMaintenanceIndexRoute,
   AuthenticatedProcessViewerIndexRoute: AuthenticatedProcessViewerIndexRoute,
@@ -855,6 +875,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
     AuthenticatedBuildingsBuildingIdConfigRoute,
   AuthenticatedAnalysisAiOnVsOffIndexRoute:
     AuthenticatedAnalysisAiOnVsOffIndexRoute,
+  AuthenticatedAnalysisComfortGroupsIndexRoute:
+    AuthenticatedAnalysisComfortGroupsIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =

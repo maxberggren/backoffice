@@ -28,13 +28,22 @@ const sampleIntervals: ScheduleInterval[] = [
 
 export const defaultSchedule: ComfortSchedule = {
   id: 'schedule-1',
-  name: 'Emporio opening hours',
+  name: 'Non-office hours',
   fromDate: new Date('2025-04-15'),
   toDate: new Date('2030-04-16'),
   isActive: true,
   mode: 'manual',
   intervals: sampleIntervals,
+  ahuId: undefined, // undefined means "all AHUs"
 }
+
+// Mock AHU list - in a real app, this would come from an API
+export const mockAHUs = [
+  { id: 'ahu-1', name: 'AHU-1 (Main Floor)' },
+  { id: 'ahu-2', name: 'AHU-2 (Second Floor)' },
+  { id: 'ahu-3', name: 'AHU-3 (Third Floor)' },
+  { id: 'ahu-4', name: 'AHU-4 (Basement)' },
+]
 
 // Simple hash function for deterministic "random" values
 function hash(str: string): number {

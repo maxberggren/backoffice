@@ -1,0 +1,20 @@
+{
+    auto_https off
+}
+
+:80 {
+    root * /app/dist
+    encode gzip zstd
+    
+    # Serve static files
+    file_server
+    
+    # Handle SPA routing - serve index.html for all routes
+    try_files {path} /index.html
+    
+    # Set correct MIME types for JavaScript modules
+    header Content-Type application/javascript "*.js"
+    header Content-Type text/css "*.css"
+}
+
+

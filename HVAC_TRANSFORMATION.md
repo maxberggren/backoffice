@@ -284,3 +284,4 @@ This boilerplate is built on the foundation of [shadcn-admin](https://github.com
 
 Licensed under the [MIT License](https://choosealicense.com/licenses/mit/)
 
+
