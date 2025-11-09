@@ -1,4 +1,14 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
+import {
+  type SortingState,
+  type VisibilityState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -6,13 +16,6 @@ import { ThemeSwitch } from '@/components/theme-switch'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
 import { Badge } from '@/components/ui/badge'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle, Activity } from 'lucide-react'
@@ -24,6 +27,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+import { createSignalColumns } from './signal-columns'
+import { DataTableViewOptions } from '@/components/data-table'
 
 // Sample signal data
 const generateSignals = () => {
@@ -55,7 +60,7 @@ const generateSignals = () => {
   return signals
 }
 
-type Signal = {
+export type Signal = {
   id: number
   name: string
   rw: string
@@ -69,28 +74,64 @@ type Signal = {
 
 export function SignalViewer() {
   const [signals, setSignals] = useState<Signal[]>(generateSignals())
-  const [currentPage, setCurrentPage] = useState(1)
   const [searchTerm, setSearchTerm] = useState('')
   const [validation, setValidation] = useState(false)
   const [nameEditing, setNameEditing] = useState(false)
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const itemsPerPage = 50
 
-  const filteredSignals = signals.filter((signal) =>
-    signal.name.toLowerCase().includes(searchTerm.toLowerCase())
-  )
-
-  const totalPages = Math.ceil(filteredSignals.length / itemsPerPage)
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
-  const currentSignals = filteredSignals.slice(startIndex, endIndex)
-
-  const updateSignal = (signalId: number, field: keyof Signal, value: string | number | boolean) => {
+  const updateSignal = useCallback((signalId: number, field: keyof Signal, value: string | number | boolean) => {
     setSignals((prev) => {
       return prev.map((signal) =>
         signal.id === signalId ? { ...signal, [field]: value } : signal
       )
     })
-  }
+  }, [])
+
+  const columns = useMemo(
+    () => createSignalColumns({ nameEditing, updateSignal }),
+    [nameEditing, updateSignal]
+  )
+
+  // eslint-disable-next-line react-hooks/incompatible-library
+  const table = useReactTable({
+    data: signals,
+    columns,
+    state: {
+      sorting,
+      globalFilter: searchTerm,
+      columnVisibility,
+    },
+    onSortingChange: setSorting,
+    onGlobalFilterChange: setSearchTerm,
+    onColumnVisibilityChange: setColumnVisibility,
+    globalFilterFn: (row, _columnId, filterValue) => {
+      const search = filterValue.toLowerCase()
+      return (
+        row.original.name.toLowerCase().includes(search) ||
+        row.original.description.toLowerCase().includes(search) ||
+        row.original.classification.toLowerCase().includes(search) ||
+        row.original.rw.toLowerCase().includes(search) ||
+        row.original.type.toLowerCase().includes(search)
+      )
+    },
+    getCoreRowModel: getCoreRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    initialState: {
+      pagination: {
+        pageSize: itemsPerPage,
+      },
+    },
+  })
+
+  const filteredCount = table.getFilteredRowModel().rows.length
+  const currentPage = table.getState().pagination.pageIndex + 1
+  const totalPages = table.getPageCount()
+  const startIndex = table.getState().pagination.pageIndex * itemsPerPage
+  const endIndex = startIndex + table.getRowModel().rows.length
 
   const validationErrors = [
     'Signal "Atrium_Flora_P2_S7_temperature" has out-of-range value',
@@ -183,9 +224,10 @@ export function SignalViewer() {
               <Button
                 className='ms-auto'
                 onClick={() => {
+                  const visibleSignalIds = table.getRowModel().rows.map((row) => row.original.id)
                   setSignals((prev) =>
                     prev.map((signal) =>
-                      currentSignals.some((cs) => cs.id === signal.id)
+                      visibleSignalIds.includes(signal.id)
                         ? { ...signal, enabled: true }
                         : signal
                     )
@@ -198,125 +240,63 @@ export function SignalViewer() {
 
             <div className='flex items-center justify-between'>
               <div className='text-muted-foreground text-sm'>
-                Showing {startIndex + 1} to {Math.min(endIndex, filteredSignals.length)} of{' '}
-                {filteredSignals.length} entries
+                Showing {startIndex + 1} to {Math.min(endIndex, filteredCount)} of{' '}
+                {filteredCount} entries
               </div>
-              <Input
-                placeholder='Search...'
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value)
-                  setCurrentPage(1)
-                }}
-                className='max-w-xs'
-              />
+              <div className='flex items-center gap-2'>
+                <Input
+                  placeholder='Search...'
+                  value={searchTerm}
+                  onChange={(e) => {
+                    setSearchTerm(e.target.value)
+                    table.setPageIndex(0)
+                  }}
+                  className='max-w-xs'
+                />
+                <DataTableViewOptions table={table} />
+              </div>
             </div>
 
             <div className='rounded-md border'>
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>R/W</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Classification</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead className='text-right'>Min</TableHead>
-                    <TableHead className='text-right'>Max</TableHead>
-                    <TableHead>Enabled</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {currentSignals.map((signal) => (
-                    <TableRow key={signal.id}>
-                      <TableCell className='font-mono text-xs'>
-                        {nameEditing ? (
-                          <Input
-                            value={signal.name}
-                            onChange={(e) => updateSignal(signal.id, 'name', e.target.value)}
-                            className='h-8 text-xs'
-                          />
-                        ) : (
-                          signal.name
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={signal.rw}
-                          onValueChange={(value) => updateSignal(signal.id, 'rw', value)}
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <TableRow key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <TableHead
+                          key={header.id}
+                          colSpan={header.colSpan}
+                          className={header.column.columnDef.meta?.className}
                         >
-                          <SelectTrigger className='h-8 w-16'>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='R'>R</SelectItem>
-                            <SelectItem value='W'>W</SelectItem>
-                            <SelectItem value='RW'>RW</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={signal.type}
-                          onValueChange={(value) => updateSignal(signal.id, 'type', value)}
-                        >
-                          <SelectTrigger className='h-8 w-16'>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='O'>O</SelectItem>
-                            <SelectItem value='I'>I</SelectItem>
-                            <SelectItem value='V'>V</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell>
-                        <Select
-                          value={signal.classification}
-                          onValueChange={(value) => updateSignal(signal.id, 'classification', value)}
-                        >
-                          <SelectTrigger className='h-8 w-20'>
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='GT'>GT</SelectItem>
-                            <SelectItem value='CO2'>CO2</SelectItem>
-                            <SelectItem value='RH'>RH</SelectItem>
-                            <SelectItem value='P'>P</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </TableCell>
-                      <TableCell className='text-sm'>
-                        <Input
-                          value={signal.description}
-                          onChange={(e) => updateSignal(signal.id, 'description', e.target.value)}
-                          className='h-8 text-sm'
-                        />
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        <Input
-                          type='number'
-                          value={signal.min}
-                          onChange={(e) => updateSignal(signal.id, 'min', parseFloat(e.target.value) || 0)}
-                          className='h-8 w-20 text-right'
-                        />
-                      </TableCell>
-                      <TableCell className='text-right'>
-                        <Input
-                          type='number'
-                          value={signal.max}
-                          onChange={(e) => updateSignal(signal.id, 'max', parseFloat(e.target.value) || 0)}
-                          className='h-8 w-20 text-right'
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Checkbox
-                          checked={signal.enabled}
-                          onCheckedChange={(checked) => updateSignal(signal.id, 'enabled', checked as boolean)}
-                        />
-                      </TableCell>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </TableHead>
+                      ))}
                     </TableRow>
                   ))}
+                </TableHeader>
+                <TableBody>
+                  {table.getRowModel().rows?.length ? (
+                    table.getRowModel().rows.map((row) => (
+                      <TableRow key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <TableCell
+                            key={cell.id}
+                            className={cell.column.columnDef.meta?.className}
+                          >
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={columns.length} className='h-24 text-center'>
+                        No results.
+                      </TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </div>
@@ -325,21 +305,21 @@ export function SignalViewer() {
               <Button
                 variant='outline'
                 size='sm'
-                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-                disabled={currentPage === 1}
+                onClick={() => table.previousPage()}
+                disabled={!table.getCanPreviousPage()}
               >
                 Previous
               </Button>
               {[...Array(Math.min(10, totalPages))].map((_, i) => {
-                const page = i + 1
+                const page = i
                 return (
                   <Button
                     key={page}
-                    variant={currentPage === page ? 'default' : 'outline'}
+                    variant={currentPage === page + 1 ? 'default' : 'outline'}
                     size='sm'
-                    onClick={() => setCurrentPage(page)}
+                    onClick={() => table.setPageIndex(page)}
                   >
-                    {page}
+                    {page + 1}
                   </Button>
                 )
               })}
@@ -347,8 +327,8 @@ export function SignalViewer() {
               <Button
                 variant='outline'
                 size='sm'
-                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
-                disabled={currentPage === totalPages}
+                onClick={() => table.nextPage()}
+                disabled={!table.getCanNextPage()}
               >
                 Next
               </Button>

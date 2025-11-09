@@ -171,27 +171,33 @@ export function ComfortGroupsChart({
     }
   })
 
-  // Determine if we should show hours (if range is less than a day)
-  const shouldShowHours = (() => {
-    if (data.length < 2) return false
-    const firstDate = new Date(data[0].timestamp)
-    const lastDate = new Date(data[data.length - 1].timestamp)
-    const diffInHours = (lastDate.getTime() - firstDate.getTime()) / (1000 * 60 * 60)
-    return diffInHours < 24
-  })()
+  // Track previous day to avoid repeating day labels
+  const previousDayRef = useRef<string | null>(null)
 
-  // Format timestamp for X-axis
+  // Format timestamp for X-axis - always show HH:MM, show day only when it changes
   const formatXAxis = (tickItem: string) => {
     try {
       const date = new Date(tickItem)
-      if (shouldShowHours) {
-        return format(date, 'HH:mm')
+      const currentDay = format(date, 'MMM d')
+      const time = format(date, 'HH:mm')
+      
+      // Show day only if it's different from the previous tick
+      if (previousDayRef.current !== currentDay) {
+        previousDayRef.current = currentDay
+        return `${currentDay} ${time}`
       }
-      return format(date, 'MMM d')
+      
+      // Just show time if same day
+      return time
     } catch {
       return tickItem
     }
   }
+
+  // Reset previous day ref when data changes
+  useEffect(() => {
+    previousDayRef.current = null
+  }, [data])
 
   return (
     <div ref={containerRef}>
