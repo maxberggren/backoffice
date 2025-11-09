@@ -1,4 +1,4 @@
-import { ComfortSchedule, ScheduleInterval } from './schema'
+import type { ComfortSchedule, ScheduleInterval } from './schema'
 
 // Sample intervals for "Emporio opening hours"
 const sampleIntervals: ScheduleInterval[] = [

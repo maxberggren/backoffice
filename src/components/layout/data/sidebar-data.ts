@@ -27,6 +27,7 @@ import {
   Sparkles,
   Table2,
   Layers,
+  Gauge,
 } from 'lucide-react'
 import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
@@ -88,6 +89,11 @@ export const sidebarData: SidebarData = {
           title: 'Export to Excel',
           url: '/signals/export',
           icon: Download,
+        },
+        {
+          title: 'Read-Write Discrepancies',
+          url: '/signals/discrepancies',
+          icon: Gauge,
         },
       ],
     },

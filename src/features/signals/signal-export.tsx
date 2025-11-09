@@ -19,6 +19,7 @@ export function SignalExport() {
 
   const handleExport = () => {
     // In a real implementation, this would call an API endpoint
+    // eslint-disable-next-line no-console
     console.log('Exporting signals:', { signalType, experimentalType })
     // Simulate file download
     alert('Excel file download would start here')

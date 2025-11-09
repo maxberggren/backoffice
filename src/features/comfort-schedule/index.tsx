@@ -42,13 +42,13 @@ import {
 } from '@/components/ui/dialog'
 import { Plus, Trash2, Thermometer } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type {
-  ComfortSchedule,
-  ScheduleInterval,
-  OperatingMode,
-  DayOfWeek,
+import {
+  type ComfortSchedule,
+  type ScheduleInterval,
+  type OperatingMode,
+  type DayOfWeek,
+  scheduleIntervalSchema,
 } from './data/schema'
-import { scheduleIntervalSchema } from './data/schema'
 import { defaultSchedule, getCO2Level, mockAHUs } from './data/schedule'
 
 const DAYS_OF_WEEK: DayOfWeek[] = [
@@ -580,7 +580,7 @@ export function ComfortSchedule() {
     setTimeout(() => {
       setHasDragged(false)
     }, 0)
-  }, [draggedInterval, dragOffset, resizeHandle, resizeStartMinutes, dragStartMinutes, schedule, updateSchedule, isAllAHUsMode, selectedIndividualAHU])
+  }, [draggedInterval, dragOffset, resizeHandle, resizeStartMinutes, dragStartMinutes, schedule, updateSchedule])
 
   // Set up global mouse event listeners
   React.useEffect(() => {

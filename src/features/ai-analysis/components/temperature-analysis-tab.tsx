@@ -1,15 +1,18 @@
-import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, Cell } from 'recharts'
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, Cell, type BarProps } from 'recharts'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type TemperatureBin, type ImpactMetrics } from '../data/schema'
 
 // Custom bar shape with rounded top corners
-const RoundedBar = (props: any) => {
+const RoundedBar = (props: BarProps & { x?: number; y?: number; width?: number; height?: number }) => {
   const { fill, x, y, width, height, fillOpacity } = props
   const radius = 4 // Corner radius
   
-  if (height <= 0) return null
+  // Always return a valid element, even if height is invalid
+  if (!x || !y || !width || !height || height <= 0) {
+    return <path d="" fill="transparent" />
+  }
   
   // Create path with rounded top corners
   const path = `

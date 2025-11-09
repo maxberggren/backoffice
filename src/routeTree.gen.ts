@@ -40,6 +40,7 @@ import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-
 import { Route as AuthenticatedUsersBuildingIdRouteImport } from './routes/_authenticated/users/$buildingId'
 import { Route as AuthenticatedSignalsViewerRouteImport } from './routes/_authenticated/signals/viewer'
 import { Route as AuthenticatedSignalsExportRouteImport } from './routes/_authenticated/signals/export'
+import { Route as AuthenticatedSignalsDiscrepanciesRouteImport } from './routes/_authenticated/signals/discrepancies'
 import { Route as AuthenticatedSignalsAiOutputRouteImport } from './routes/_authenticated/signals/ai-output'
 import { Route as AuthenticatedSettingsNotificationsRouteImport } from './routes/_authenticated/settings/notifications'
 import { Route as AuthenticatedSettingsDisplayRouteImport } from './routes/_authenticated/settings/display'
@@ -212,6 +213,12 @@ const AuthenticatedSignalsExportRoute =
     path: '/signals/export',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSignalsDiscrepanciesRoute =
+  AuthenticatedSignalsDiscrepanciesRouteImport.update({
+    id: '/signals/discrepancies',
+    path: '/signals/discrepancies',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSignalsAiOutputRoute =
   AuthenticatedSignalsAiOutputRouteImport.update({
     id: '/signals/ai-output',
@@ -288,6 +295,7 @@ export interface FileRoutesByFullPath {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
+  '/signals/discrepancies': typeof AuthenticatedSignalsDiscrepanciesRoute
   '/signals/export': typeof AuthenticatedSignalsExportRoute
   '/signals/viewer': typeof AuthenticatedSignalsViewerRoute
   '/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
@@ -326,6 +334,7 @@ export interface FileRoutesByTo {
   '/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
+  '/signals/discrepancies': typeof AuthenticatedSignalsDiscrepanciesRoute
   '/signals/export': typeof AuthenticatedSignalsExportRoute
   '/signals/viewer': typeof AuthenticatedSignalsViewerRoute
   '/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
@@ -369,6 +378,7 @@ export interface FileRoutesById {
   '/_authenticated/settings/display': typeof AuthenticatedSettingsDisplayRoute
   '/_authenticated/settings/notifications': typeof AuthenticatedSettingsNotificationsRoute
   '/_authenticated/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
+  '/_authenticated/signals/discrepancies': typeof AuthenticatedSignalsDiscrepanciesRoute
   '/_authenticated/signals/export': typeof AuthenticatedSignalsExportRoute
   '/_authenticated/signals/viewer': typeof AuthenticatedSignalsViewerRoute
   '/_authenticated/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
@@ -411,6 +421,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/signals/ai-output'
+    | '/signals/discrepancies'
     | '/signals/export'
     | '/signals/viewer'
     | '/users/$buildingId'
@@ -449,6 +460,7 @@ export interface FileRouteTypes {
     | '/settings/display'
     | '/settings/notifications'
     | '/signals/ai-output'
+    | '/signals/discrepancies'
     | '/signals/export'
     | '/signals/viewer'
     | '/users/$buildingId'
@@ -491,6 +503,7 @@ export interface FileRouteTypes {
     | '/_authenticated/settings/display'
     | '/_authenticated/settings/notifications'
     | '/_authenticated/signals/ai-output'
+    | '/_authenticated/signals/discrepancies'
     | '/_authenticated/signals/export'
     | '/_authenticated/signals/viewer'
     | '/_authenticated/users/$buildingId'
@@ -745,6 +758,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSignalsExportRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/signals/discrepancies': {
+      id: '/_authenticated/signals/discrepancies'
+      path: '/signals/discrepancies'
+      fullPath: '/signals/discrepancies'
+      preLoaderRoute: typeof AuthenticatedSignalsDiscrepanciesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/signals/ai-output': {
       id: '/_authenticated/signals/ai-output'
       path: '/signals/ai-output'
@@ -839,6 +859,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedErrorsErrorRoute: typeof AuthenticatedErrorsErrorRoute
   AuthenticatedSignalsAiOutputRoute: typeof AuthenticatedSignalsAiOutputRoute
+  AuthenticatedSignalsDiscrepanciesRoute: typeof AuthenticatedSignalsDiscrepanciesRoute
   AuthenticatedSignalsExportRoute: typeof AuthenticatedSignalsExportRoute
   AuthenticatedSignalsViewerRoute: typeof AuthenticatedSignalsViewerRoute
   AuthenticatedUsersBuildingIdRoute: typeof AuthenticatedUsersBuildingIdRoute
@@ -860,6 +881,8 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedErrorsErrorRoute: AuthenticatedErrorsErrorRoute,
   AuthenticatedSignalsAiOutputRoute: AuthenticatedSignalsAiOutputRoute,
+  AuthenticatedSignalsDiscrepanciesRoute:
+    AuthenticatedSignalsDiscrepanciesRoute,
   AuthenticatedSignalsExportRoute: AuthenticatedSignalsExportRoute,
   AuthenticatedSignalsViewerRoute: AuthenticatedSignalsViewerRoute,
   AuthenticatedUsersBuildingIdRoute: AuthenticatedUsersBuildingIdRoute,

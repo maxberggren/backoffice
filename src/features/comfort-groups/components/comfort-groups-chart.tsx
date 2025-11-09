@@ -11,8 +11,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { useEffect, useRef, useState } from 'react'
-import { type TimeSeriesPoint } from '../data/schema'
-import { type GroupData } from '../data/schema'
+import { type TimeSeriesPoint, type GroupData } from '../data/schema'
 
 interface ComfortGroupsChartProps {
   data: TimeSeriesPoint[]
@@ -153,6 +152,14 @@ export function ComfortGroupsChart({
     setHiddenLines(hidden)
   }
 
+  // Track previous day to avoid repeating day labels
+  const previousDayRef = useRef<string | null>(null)
+
+  // Reset previous day ref when data changes
+  useEffect(() => {
+    previousDayRef.current = null
+  }, [data])
+
   if (isLoading || !data || data.length === 0) {
     return (
       <div>
@@ -170,9 +177,6 @@ export function ComfortGroupsChart({
       maxComfortLimit: limits.maxLimit,
     }
   })
-
-  // Track previous day to avoid repeating day labels
-  const previousDayRef = useRef<string | null>(null)
 
   // Format timestamp for X-axis - always show HH:MM, show day only when it changes
   const formatXAxis = (tickItem: string) => {
@@ -193,11 +197,6 @@ export function ComfortGroupsChart({
       return tickItem
     }
   }
-
-  // Reset previous day ref when data changes
-  useEffect(() => {
-    previousDayRef.current = null
-  }, [data])
 
   return (
     <div ref={containerRef}>

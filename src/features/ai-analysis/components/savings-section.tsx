@@ -38,10 +38,12 @@ export function SavingsSection({ config, signalName, minSamples, categorySignals
     ? createTemperatureHistogram(processedData, actualSignalName, minSamples)
     : null
 
-  const savingsData =
-    histogram && savingsStartDate && savingsEndDate && processedData && actualSignalName
-      ? calculateDailySavings(processedData, actualSignalName, histogram, savingsStartDate, savingsEndDate)
-      : []
+  const savingsData = useMemo(() => {
+    if (!histogram || !savingsStartDate || !savingsEndDate || !processedData || !actualSignalName) {
+      return []
+    }
+    return calculateDailySavings(processedData, actualSignalName, histogram, savingsStartDate, savingsEndDate)
+  }, [histogram, savingsStartDate, savingsEndDate, processedData, actualSignalName])
 
   const totalSavings = savingsData.reduce((sum, d) => sum + d.actualSavings, 0)
   const totalPotential = savingsData.reduce((sum, d) => sum + d.potentialSavings, 0)

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   type SortingState,
   type VisibilityState,
@@ -8,17 +8,15 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type ColumnDef,
 } from '@tanstack/react-table'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Input } from '@/components/ui/input'
-import { Button } from '@/components/ui/button'
-import { Checkbox } from '@/components/ui/checkbox'
 import { Badge } from '@/components/ui/badge'
-import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertCircle, Activity } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 import {
   Table,
   TableBody,
@@ -27,76 +25,91 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { createSignalColumns } from './signal-columns'
-import { DataTableViewOptions } from '@/components/data-table'
+import { DataTableViewOptions, DataTableColumnHeader } from '@/components/data-table'
+import { Activity } from 'lucide-react'
 
-// Sample signal data
-const generateSignals = () => {
-  const signals = []
-  const buildings = ['Atrium Flora', 'Corporate Tower', 'Tech Hub']
-  const types = ['temperature', 'co2', 'humidity', 'pressure']
-  const classifications = ['GT', 'CO2', 'RH', 'P']
-  let id = 0
-  
-  for (const building of buildings) {
-    for (let floor = 0; floor < 4; floor++) {
-      for (let zone = 5; zone < 9; zone++) {
-        for (let i = 0; i < types.length; i++) {
-          signals.push({
-            id: id++,
-            name: `${building.replace(/\s/g, '_')}_P${floor}_S${zone}_${types[i]}`,
-            rw: 'R',
-            type: 'O',
-            classification: classifications[i],
-            description: `${building},${floor},${zone}`,
-            min: types[i] === 'temperature' ? 18 : types[i] === 'co2' ? 300 : types[i] === 'humidity' ? 30 : 0,
-            max: types[i] === 'temperature' ? 24 : types[i] === 'co2' ? 1000 : types[i] === 'humidity' ? 70 : 100,
-            enabled: Math.random() > 0.3,
-          })
-        }
-      }
-    }
-  }
-  return signals
-}
-
-export type Signal = {
+export type Discrepancy = {
   id: number
-  name: string
-  rw: string
-  type: string
-  classification: string
-  description: string
-  min: number
-  max: number
-  enabled: boolean
+  variable: string
+  status: 'OK' | 'WARNING' | 'ERROR'
+  discrepancyValue: number
 }
 
-export function SignalViewer() {
-  const [signals, setSignals] = useState<Signal[]>(generateSignals())
+// Sample data based on the image
+const generateDiscrepancies = (): Discrepancy[] => {
+  return [
+    { id: 1, variable: 'KB13_GT101', status: 'OK', discrepancyValue: 0.55 },
+    { id: 2, variable: 'LB22_GT101', status: 'OK', discrepancyValue: 0.09 },
+    { id: 3, variable: 'LB23_GT101', status: 'OK', discrepancyValue: 0.97 },
+    { id: 4, variable: 'VS21_GT101', status: 'OK', discrepancyValue: 0.13 },
+    { id: 5, variable: 'LB11_GP101', status: 'OK', discrepancyValue: 0.25 },
+    { id: 6, variable: 'LB22_GP101', status: 'OK', discrepancyValue: 1.0 },
+    { id: 7, variable: 'LB21_GT101', status: 'OK', discrepancyValue: 0.06 },
+    { id: 8, variable: 'VS13_GT101', status: 'OK', discrepancyValue: 0.16 },
+    { id: 9, variable: 'VS14_GT101', status: 'OK', discrepancyValue: 1.61 },
+    { id: 10, variable: 'LB11_GT101', status: 'OK', discrepancyValue: 0.44 },
+  ]
+}
+
+const createDiscrepancyColumns = (): ColumnDef<Discrepancy>[] => [
+  {
+    accessorKey: 'variable',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Variable' />
+    ),
+    cell: ({ row }) => (
+      <div className='font-mono text-sm'>{row.getValue('variable')}</div>
+    ),
+  },
+  {
+    accessorKey: 'status',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title='Status' />
+    ),
+    cell: ({ row }) => {
+      const status = row.getValue('status') as string
+      return (
+        <Badge
+          variant='outline'
+          className='bg-green-50 text-green-700 border-green-200 dark:bg-green-950 dark:text-green-400 dark:border-green-800'
+        >
+          {status}
+        </Badge>
+      )
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: 'discrepancyValue',
+    header: ({ column }) => (
+      <div className='flex justify-end'>
+        <DataTableColumnHeader column={column} title='Discrepancy Value' />
+      </div>
+    ),
+    cell: ({ row }) => {
+      const value = row.getValue('discrepancyValue') as number
+      return (
+        <div className='text-right font-mono text-sm'>
+          {value.toFixed(2)} °C
+        </div>
+      )
+    },
+    enableSorting: true,
+    meta: { className: 'text-right' },
+  },
+]
+
+export function DiscrepanciesViewer() {
+  const [discrepancies] = useState<Discrepancy[]>(generateDiscrepancies())
   const [searchTerm, setSearchTerm] = useState('')
-  const [validation, setValidation] = useState(false)
-  const [nameEditing, setNameEditing] = useState(false)
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const itemsPerPage = 50
 
-  const updateSignal = useCallback((signalId: number, field: keyof Signal, value: string | number | boolean) => {
-    setSignals((prev) => {
-      return prev.map((signal) =>
-        signal.id === signalId ? { ...signal, [field]: value } : signal
-      )
-    })
-  }, [])
+  const columns = useMemo(() => createDiscrepancyColumns(), [])
 
-  const columns = useMemo(
-    () => createSignalColumns({ nameEditing, updateSignal }),
-    [nameEditing, updateSignal]
-  )
-
-  // eslint-disable-next-line react-hooks/incompatible-library
   const table = useReactTable({
-    data: signals,
+    data: discrepancies,
     columns,
     state: {
       sorting,
@@ -109,11 +122,8 @@ export function SignalViewer() {
     globalFilterFn: (row, _columnId, filterValue) => {
       const search = filterValue.toLowerCase()
       return (
-        row.original.name.toLowerCase().includes(search) ||
-        row.original.description.toLowerCase().includes(search) ||
-        row.original.classification.toLowerCase().includes(search) ||
-        row.original.rw.toLowerCase().includes(search) ||
-        row.original.type.toLowerCase().includes(search)
+        row.original.variable.toLowerCase().includes(search) ||
+        row.original.status.toLowerCase().includes(search)
       )
     },
     getCoreRowModel: getCoreRowModel(),
@@ -133,11 +143,6 @@ export function SignalViewer() {
   const startIndex = table.getState().pagination.pageIndex * itemsPerPage
   const endIndex = startIndex + table.getRowModel().rows.length
 
-  const validationErrors = [
-    'Signal "Atrium_Flora_P2_S7_temperature" has out-of-range value',
-    'Signal "Tech_Hub_P1_S5_co2" missing last 3 readings',
-  ]
-
   return (
     <>
       <Header fixed>
@@ -153,91 +158,21 @@ export function SignalViewer() {
             <div className='flex items-center gap-2'>
               <Activity className='h-6 w-6' />
               <h2 className='text-2xl font-bold tracking-tight'>
-                Signal Viewer
+                Read-Write Discrepancies
               </h2>
             </div>
             <p className='text-muted-foreground'>
-              View and manage HVAC sensor signals and control points
+              Monitor discrepancies between read and write values for signal variables
             </p>
           </div>
-          <Button variant='outline'>Show Changelog</Button>
         </div>
-
-        {validation && validationErrors.length > 0 && (
-          <Alert variant='destructive'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>
-              <div className='flex items-center gap-2'>
-                <span className='font-semibold'>
-                  Validation Messages
-                </span>
-                <Badge variant='destructive'>{validationErrors.length}</Badge>
-              </div>
-              <ul className='mt-2 space-y-1 text-sm'>
-                {validationErrors.map((error, i) => (
-                  <li key={i}>• {error}</li>
-                ))}
-              </ul>
-            </AlertDescription>
-          </Alert>
-        )}
 
         <div className='rounded-lg border bg-card'>
           <div className='border-b p-4'>
-            <h3 className='font-semibold'>Signals & Controls</h3>
+            <h3 className='font-semibold'>Discrepancy Data</h3>
           </div>
 
           <div className='space-y-4 p-4'>
-            <div className='flex flex-wrap items-center gap-4'>
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='validation'
-                  checked={validation}
-                  onCheckedChange={(checked) =>
-                    setValidation(checked as boolean)
-                  }
-                />
-                <label
-                  htmlFor='validation'
-                  className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                >
-                  Validation
-                </label>
-              </div>
-
-              <div className='flex items-center space-x-2'>
-                <Checkbox
-                  id='nameEditing'
-                  checked={nameEditing}
-                  onCheckedChange={(checked) =>
-                    setNameEditing(checked as boolean)
-                  }
-                />
-                <label
-                  htmlFor='nameEditing'
-                  className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
-                >
-                  Name editing
-                </label>
-              </div>
-
-              <Button
-                className='ms-auto'
-                onClick={() => {
-                  const visibleSignalIds = table.getRowModel().rows.map((row) => row.original.id)
-                  setSignals((prev) =>
-                    prev.map((signal) =>
-                      visibleSignalIds.includes(signal.id)
-                        ? { ...signal, enabled: true }
-                        : signal
-                    )
-                  )
-                }}
-              >
-                Enable all visible signals
-              </Button>
-            </div>
-
             <div className='flex items-center justify-between'>
               <div className='text-muted-foreground text-sm'>
                 Showing {startIndex + 1} to {Math.min(endIndex, filteredCount)} of{' '}
@@ -245,7 +180,7 @@ export function SignalViewer() {
               </div>
               <div className='flex items-center gap-2'>
                 <Input
-                  placeholder='Search...'
+                  placeholder='Search variables...'
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value)

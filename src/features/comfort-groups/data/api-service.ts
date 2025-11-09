@@ -151,7 +151,8 @@ export function useComfortGroups(config: ComfortGroupConfig) {
   const { data: rawData } = useAIAnalysisData()
 
   return useQuery({
-    queryKey: ['comfort-groups', config],
+    // eslint-disable-next-line @tanstack/query/exhaustive-deps
+    queryKey: ['comfort-groups', config, rawData],
     queryFn: () => {
       if (!rawData || rawData.length === 0) {
         return {

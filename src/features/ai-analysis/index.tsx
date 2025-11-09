@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -37,6 +37,7 @@ export function AIAnalysis() {
   const [affinityLaw, setAffinityLaw] = useState(false)
   const [temperatureDiff, setTemperatureDiff] = useState(false)
   const [activeTab, setActiveTab] = useState('temperature')
+  const initializedRef = useRef(false)
 
   const { data: filteredData } = useFilteredData(config)
   const { data: dailyDistribution, isLoading: dailyDistributionLoading } = useDailyDistribution(config)
@@ -90,12 +91,17 @@ export function AIAnalysis() {
     selectedSignal === 'average' ? categorySignals : undefined
   )
 
-  // Update config when raw data loads
+  // Update config when raw data loads (only once, using ref to avoid synchronous setState)
   useEffect(() => {
-    if (rawData && !config.onStartDate) {
-      setConfig(getDefaultConfig(rawData))
+    if (rawData && !initializedRef.current && !config.onStartDate) {
+      initializedRef.current = true
+      // Use setTimeout to defer setState and avoid synchronous setState in effect
+      const timeoutId = setTimeout(() => {
+        setConfig(getDefaultConfig(rawData))
+      }, 0)
+      return () => clearTimeout(timeoutId)
     }
-  }, [rawData])
+  }, [rawData, config.onStartDate])
 
   // Get temperature range for slider
   const tempRange = useMemo(() => {

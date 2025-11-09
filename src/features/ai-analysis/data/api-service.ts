@@ -105,6 +105,7 @@ async function loadCSVData(): Promise<AIAnalysisDataRow[]> {
     cachedData = data
     return data
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error('Error loading CSV data:', error)
     throw error
   }
@@ -125,7 +126,7 @@ export function useFilteredData(config: AnalysisConfig) {
   const { data: rawData } = useAIAnalysisData()
 
   return useQuery({
-    queryKey: ['filtered-data', config],
+    queryKey: ['filtered-data', config, rawData],
     queryFn: () => {
       if (!rawData) return []
       let filtered = filterByControlAndDates(rawData, config)
@@ -142,7 +143,7 @@ export function useDailyDistribution(config: AnalysisConfig) {
   const { data: filteredData } = useFilteredData(config)
 
   return useQuery({
-    queryKey: ['daily-distribution', config],
+    queryKey: ['daily-distribution', config, filteredData],
     queryFn: () => {
       if (!filteredData) return []
       const distribution = new Map<string, DailyDistribution>()
@@ -178,7 +179,7 @@ export function useTemperatureAnalysis(
   const { data: filteredData } = useFilteredData(config)
 
   return useQuery({
-    queryKey: ['temperature-analysis', config, signalName, dayFilter, categorySignals],
+    queryKey: ['temperature-analysis', config, signalName, dayFilter, categorySignals, filteredData],
     queryFn: () => {
       if (!filteredData || !signalName) return null
 
@@ -274,7 +275,7 @@ export function useScatterData(config: AnalysisConfig, signalName: string | null
   const { data: filteredData } = useFilteredData(config)
 
   return useQuery({
-    queryKey: ['scatter-data', config, signalName, categorySignals],
+    queryKey: ['scatter-data', config, signalName, categorySignals, filteredData],
     queryFn: () => {
       if (!filteredData || !signalName) return []
       
@@ -312,7 +313,7 @@ export function useSignalAvailability(
   const { data: filteredData } = useFilteredData(config)
 
   return useQuery({
-    queryKey: ['signal-availability', config, signalName, categorySignals],
+    queryKey: ['signal-availability', config, signalName, categorySignals, filteredData],
     queryFn: () => {
       if (!filteredData || !signalName) return null
       

@@ -1,4 +1,4 @@
-import { Scatter, ScatterChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, Cell } from 'recharts'
+import { Scatter, ScatterChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, Cell, type ScatterProps } from 'recharts'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type ScatterPoint } from '../data/schema'
 
@@ -9,8 +9,11 @@ interface ScatterChartProps {
 }
 
 // Custom smaller dot component
-const SmallDot = ({ cx, cy, fill, fillOpacity }: { cx?: number; cy?: number; fill?: string; fillOpacity?: number }) => {
-  if (cx === undefined || cy === undefined) return null
+const SmallDot = (props: ScatterProps['shape']) => {
+  const { cx, cy, fill, fillOpacity } = props as { cx?: number; cy?: number; fill?: string; fillOpacity?: number }
+  if (cx === undefined || cy === undefined) {
+    return <circle cx={0} cy={0} r={0} fill="transparent" />
+  }
   return <circle cx={cx} cy={cy} r={1.5} fill={fill} fillOpacity={fillOpacity} />
 }
 
