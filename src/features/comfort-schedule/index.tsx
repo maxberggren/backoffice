@@ -1,6 +1,5 @@
 import { useState, useCallback } from 'react'
 import * as React from 'react'
-import { format } from 'date-fns'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
@@ -41,13 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover'
-import { Calendar } from '@/components/ui/calendar'
-import { CalendarIcon, Plus, Trash2, Thermometer } from 'lucide-react'
+import { Plus, Trash2, Thermometer } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type {
   ComfortSchedule,
@@ -544,7 +537,7 @@ export function ComfortSchedule() {
         const newDurationMins = newDurationMinutes % 60
         
         updateSchedule({
-          intervals: schedule.intervals.map((i) =>
+          intervals: schedule!.intervals.map((i) =>
             i.id === interval.id
               ? {
                   ...i,
@@ -566,7 +559,7 @@ export function ComfortSchedule() {
       const newStartTime = minutesToTime(clampedMinutes)
       
       updateSchedule({
-        intervals: schedule.intervals.map((i) =>
+        intervals: schedule!.intervals.map((i) =>
           i.id === interval.id
             ? {
                 ...i,

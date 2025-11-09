@@ -47,6 +47,7 @@ function getComfortGroups(availableSignals: string[]): GroupData[] {
         category: {
           id: `group_${i + 1}`,
           name: `Group ${i + 1}`,
+          pattern: `Group ${i + 1}`,
         },
         signalNames,
         data: [],
@@ -113,8 +114,6 @@ function calculateOverallStats(
 
   for (const point of timeSeriesData) {
     const groupValues: number[] = []
-    const groupMins: number[] = []
-    const groupMaxs: number[] = []
 
     for (const group of groups) {
       const value = point[group.category.name] as number | null
@@ -149,7 +148,7 @@ function calculateOverallStats(
  * Hook to get comfort groups data
  */
 export function useComfortGroups(config: ComfortGroupConfig) {
-  const { data: rawData, isLoading: dataLoading } = useAIAnalysisData()
+  const { data: rawData } = useAIAnalysisData()
 
   return useQuery({
     queryKey: ['comfort-groups', config],

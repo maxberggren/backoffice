@@ -196,7 +196,7 @@ export function ComfortGroupsChart({
   return (
     <div ref={containerRef}>
       <ResponsiveContainer width='100%' height={400}>
-        <LineChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }} isAnimationActive={false}>
+        <LineChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
           <CartesianGrid strokeDasharray='3 3' stroke='hsl(var(--muted))' opacity={0.3} />
           <XAxis
             dataKey='timestamp'
@@ -215,7 +215,7 @@ export function ComfortGroupsChart({
             tickLine={false}
             axisLine={false}
             width={35}
-            padding={{ left: 0, right: 0 }}
+            padding={{ top: 0, bottom: 0 }}
             domain={[10, 30]}
             tickFormatter={(value) => {
               const num = Number(value)
@@ -231,7 +231,7 @@ export function ComfortGroupsChart({
               return (
                 <div className='bg-background border rounded-lg p-3 shadow-lg'>
                   <p className='font-semibold mb-2'>
-                    {format(new Date(label), 'MMM d, yyyy HH:mm')}
+                    {label ? format(new Date(label), 'MMM d, yyyy HH:mm') : ''}
                   </p>
                   {payload.map((entry, index) => {
                     const value = entry.value as number | null

@@ -1,4 +1,4 @@
-import { type SignalCategory } from '../ai-analysis/data/schema'
+import { type SignalCategory } from '@/features/ai-analysis/data/schema'
 
 export interface TimeSeriesPoint {
   timestamp: string
