@@ -4,6 +4,27 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { type TemperatureBin, type ImpactMetrics } from '../data/schema'
 
+// Custom bar shape with rounded top corners
+const RoundedBar = (props: any) => {
+  const { fill, x, y, width, height, fillOpacity } = props
+  const radius = 4 // Corner radius
+  
+  if (height <= 0) return null
+  
+  // Create path with rounded top corners
+  const path = `
+    M ${x},${y + height}
+    L ${x},${y + radius}
+    Q ${x},${y} ${x + radius},${y}
+    L ${x + width - radius},${y}
+    Q ${x + width},${y} ${x + width},${y + radius}
+    L ${x + width},${y + height}
+    Z
+  `
+  
+  return <path d={path} fill={fill} fillOpacity={fillOpacity} />
+}
+
 interface TemperatureAnalysisTabProps {
   bins: TemperatureBin[] | undefined
   metrics: ImpactMetrics | undefined
@@ -106,6 +127,7 @@ export function TemperatureAnalysisTab({
                   axisLine={false}
                 />
                 <Tooltip
+                  cursor={{ fill: '#888888', opacity: 0.1 }}
                   content={({ active, payload }) => {
                     if (!active || !payload?.length) return null
                     const data = payload[0].payload
@@ -136,6 +158,7 @@ export function TemperatureAnalysisTab({
                   dataKey='onMean'
                   name='Myrspoven Control = ON'
                   fill='#e2673b'
+                  shape={RoundedBar}
                 >
                   {chartData.map((entry, index) => (
                     <Cell
@@ -149,6 +172,7 @@ export function TemperatureAnalysisTab({
                   dataKey='offMean'
                   name='Myrspoven Control = OFF'
                   fill='#c6cacc'
+                  shape={RoundedBar}
                 >
                   {chartData.map((entry, index) => (
                     <Cell

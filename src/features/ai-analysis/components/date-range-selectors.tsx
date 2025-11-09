@@ -25,21 +25,25 @@ export function DateRangeSelectors({ config, onConfigChange }: DateRangeSelector
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
-          <div className='space-y-2'>
-            <Label htmlFor='on-start-date'>Start Date</Label>
-            <DatePicker
-              selected={config.onStartDate ?? undefined}
-              onSelect={(date) => onConfigChange({ onStartDate: date ?? null })}
-              placeholder='Select start date'
-            />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='on-end-date'>End Date</Label>
-            <DatePicker
-              selected={config.onEndDate ?? undefined}
-              onSelect={(date) => onConfigChange({ onEndDate: date ?? null })}
-              placeholder='Select end date'
-            />
+          <div className='grid gap-2 md:grid-cols-2'>
+            <div className='space-y-1'>
+              <Label htmlFor='on-start-date' className='text-sm'>Start Date</Label>
+              <DatePicker
+                selected={config.onStartDate ?? undefined}
+                onSelect={(date) => onConfigChange({ onStartDate: date ?? null })}
+                placeholder='Select start date'
+                className='w-full h-9'
+              />
+            </div>
+            <div className='space-y-1'>
+              <Label htmlFor='on-end-date' className='text-sm'>End Date</Label>
+              <DatePicker
+                selected={config.onEndDate ?? undefined}
+                onSelect={(date) => onConfigChange({ onEndDate: date ?? null })}
+                placeholder='Select end date'
+                className='w-full h-9'
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -52,21 +56,25 @@ export function DateRangeSelectors({ config, onConfigChange }: DateRangeSelector
           </CardDescription>
         </CardHeader>
         <CardContent className='space-y-4'>
-          <div className='space-y-2'>
-            <Label htmlFor='off-start-date'>Start Date</Label>
-            <DatePicker
-              selected={config.offStartDate ?? undefined}
-              onSelect={(date) => onConfigChange({ offStartDate: date ?? null })}
-              placeholder='Select start date'
-            />
-          </div>
-          <div className='space-y-2'>
-            <Label htmlFor='off-end-date'>End Date</Label>
-            <DatePicker
-              selected={config.offEndDate ?? undefined}
-              onSelect={(date) => onConfigChange({ offEndDate: date ?? null })}
-              placeholder='Select end date'
-            />
+          <div className='grid gap-2 md:grid-cols-2'>
+            <div className='space-y-1'>
+              <Label htmlFor='off-start-date' className='text-sm'>Start Date</Label>
+              <DatePicker
+                selected={config.offStartDate ?? undefined}
+                onSelect={(date) => onConfigChange({ offStartDate: date ?? null })}
+                placeholder='Select start date'
+                className='w-full h-9'
+              />
+            </div>
+            <div className='space-y-1'>
+              <Label htmlFor='off-end-date' className='text-sm'>End Date</Label>
+              <DatePicker
+                selected={config.offEndDate ?? undefined}
+                onSelect={(date) => onConfigChange({ offEndDate: date ?? null })}
+                placeholder='Select end date'
+                className='w-full h-9'
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

@@ -8,6 +8,12 @@ interface ScatterChartProps {
   isLoading?: boolean
 }
 
+// Custom smaller dot component
+const SmallDot = ({ cx, cy, fill, fillOpacity }: { cx?: number; cy?: number; fill?: string; fillOpacity?: number }) => {
+  if (cx === undefined || cy === undefined) return null
+  return <circle cx={cx} cy={cy} r={1.5} fill={fill} fillOpacity={fillOpacity} />
+}
+
 export function SignalTemperatureScatterChart({ data, signalName, isLoading }: ScatterChartProps) {
   if (isLoading || !data) {
     return (
@@ -70,14 +76,14 @@ export function SignalTemperatureScatterChart({ data, signalName, isLoading }: S
             }}
           />
           <Legend />
-          <Scatter name='Control = OFF' data={offData} fill='#c6cacc' fillOpacity={0.6}>
+          <Scatter name='Control = OFF' data={offData} fill='#c6cacc' fillOpacity={0.3} shape={SmallDot}>
             {offData.map((_entry, index) => (
-              <Cell key={`off-${index}`} fill='#c6cacc' fillOpacity={0.6} />
+              <Cell key={`off-${index}`} fill='#c6cacc' fillOpacity={0.3} />
             ))}
           </Scatter>
-          <Scatter name='Control = ON' data={onData} fill='#e2673b' fillOpacity={0.6}>
+          <Scatter name='Control = ON' data={onData} fill='#e2673b' fillOpacity={0.3} shape={SmallDot}>
             {onData.map((_entry, index) => (
-              <Cell key={`on-${index}`} fill='#e2673b' fillOpacity={0.6} />
+              <Cell key={`on-${index}`} fill='#e2673b' fillOpacity={0.3} />
             ))}
           </Scatter>
         </ScatterChart>

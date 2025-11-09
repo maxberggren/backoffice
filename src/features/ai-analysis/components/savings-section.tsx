@@ -140,9 +140,9 @@ export function SavingsSection({ config, signalName, minSamples, categorySignals
     <div className='space-y-6'>
       <h2 className='text-2xl font-bold'>Savings Calculation</h2>
 
-      <div className='grid gap-4 md:grid-cols-2'>
-        <div className='space-y-2'>
-          <Label htmlFor='price-per-unit'>Cost per unit (SEK/{signalName || 'unit'})</Label>
+      <div className='grid gap-2 md:grid-cols-3'>
+        <div className='space-y-1'>
+          <Label htmlFor='price-per-unit' className='text-sm'>Cost per unit (SEK/{signalName || 'unit'})</Label>
           <Input
             id='price-per-unit'
             type='number'
@@ -150,29 +150,26 @@ export function SavingsSection({ config, signalName, minSamples, categorySignals
             onChange={(e) => setPricePerUnit(parseFloat(e.target.value) || 0)}
             step={0.01}
             min={0}
+            className='h-9'
           />
         </div>
-      </div>
-
-      <div className='space-y-4'>
-        <h3 className='font-semibold'>Savings Calculation Period</h3>
-        <div className='grid gap-4 md:grid-cols-2'>
-          <div className='space-y-2'>
-            <Label>Start date for savings calculation</Label>
-            <DatePicker
-              selected={savingsStartDate ?? undefined}
-              onSelect={(date) => setSavingsStartDate(date ?? null)}
-              placeholder='Select start date'
-            />
-          </div>
-          <div className='space-y-2'>
-            <Label>End date for savings calculation</Label>
-            <DatePicker
-              selected={savingsEndDate ?? undefined}
-              onSelect={(date) => setSavingsEndDate(date ?? null)}
-              placeholder='Select end date'
-            />
-          </div>
+        <div className='space-y-1'>
+          <Label className='text-sm'>Start date for savings calculation</Label>
+          <DatePicker
+            selected={savingsStartDate ?? undefined}
+            onSelect={(date) => setSavingsStartDate(date ?? null)}
+            placeholder='Select start date'
+            className='w-full h-9'
+          />
+        </div>
+        <div className='space-y-1'>
+          <Label className='text-sm'>End date for savings calculation</Label>
+          <DatePicker
+            selected={savingsEndDate ?? undefined}
+            onSelect={(date) => setSavingsEndDate(date ?? null)}
+            placeholder='Select end date'
+            className='w-full h-9'
+          />
         </div>
       </div>
 
