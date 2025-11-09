@@ -36,12 +36,20 @@ const generateSignals = () => {
   const buildings = ['Atrium Flora', 'Corporate Tower', 'Tech Hub']
   const types = ['temperature', 'co2', 'humidity', 'pressure']
   const classifications = ['GT', 'CO2', 'RH', 'P']
+  const signalPositions = ['Input', 'Output', 'Feedback', 'Control']
+  const signalTypes = ['Analog', 'Digital', 'Pulse', 'Modbus']
+  const sourceComponents = ['AHU-01', 'VAV-02', 'RTU-03', 'FCU-04']
+  const componentNames = ['Air Handler Unit', 'Variable Air Volume', 'Roof Top Unit', 'Fan Coil Unit']
   let id = 0
   
   for (const building of buildings) {
     for (let floor = 0; floor < 4; floor++) {
       for (let zone = 5; zone < 9; zone++) {
         for (let i = 0; i < types.length; i++) {
+          const positionIndex = Math.floor(Math.random() * signalPositions.length)
+          const typeIndex = Math.floor(Math.random() * signalTypes.length)
+          const componentIndex = Math.floor(Math.random() * sourceComponents.length)
+          
           signals.push({
             id: id++,
             name: `${building.replace(/\s/g, '_')}_P${floor}_S${zone}_${types[i]}`,
@@ -52,6 +60,10 @@ const generateSignals = () => {
             min: types[i] === 'temperature' ? 18 : types[i] === 'co2' ? 300 : types[i] === 'humidity' ? 30 : 0,
             max: types[i] === 'temperature' ? 24 : types[i] === 'co2' ? 1000 : types[i] === 'humidity' ? 70 : 100,
             enabled: Math.random() > 0.3,
+            signalPosition: signalPositions[positionIndex],
+            signalType: signalTypes[typeIndex],
+            sourceComponent: sourceComponents[componentIndex],
+            componentName: componentNames[componentIndex],
           })
         }
       }
@@ -70,6 +82,10 @@ export type Signal = {
   min: number
   max: number
   enabled: boolean
+  signalPosition?: string
+  signalType?: string
+  sourceComponent?: string
+  componentName?: string
 }
 
 export function SignalViewer() {
@@ -78,7 +94,12 @@ export function SignalViewer() {
   const [validation, setValidation] = useState(false)
   const [nameEditing, setNameEditing] = useState(false)
   const [sorting, setSorting] = useState<SortingState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    signalPosition: false,
+    signalType: false,
+    sourceComponent: false,
+    componentName: false,
+  })
   const itemsPerPage = 50
 
   const updateSignal = useCallback((signalId: number, field: keyof Signal, value: string | number | boolean) => {
@@ -108,12 +129,16 @@ export function SignalViewer() {
     onColumnVisibilityChange: setColumnVisibility,
     globalFilterFn: (row, _columnId, filterValue) => {
       const search = filterValue.toLowerCase()
-      return (
+      return !!(
         row.original.name.toLowerCase().includes(search) ||
         row.original.description.toLowerCase().includes(search) ||
         row.original.classification.toLowerCase().includes(search) ||
         row.original.rw.toLowerCase().includes(search) ||
-        row.original.type.toLowerCase().includes(search)
+        row.original.type.toLowerCase().includes(search) ||
+        row.original.signalPosition?.toLowerCase().includes(search) ||
+        row.original.signalType?.toLowerCase().includes(search) ||
+        row.original.sourceComponent?.toLowerCase().includes(search) ||
+        row.original.componentName?.toLowerCase().includes(search)
       )
     },
     getCoreRowModel: getCoreRowModel(),
@@ -148,17 +173,19 @@ export function SignalViewer() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <div className='flex items-start justify-between'>
-          <div>
-            <div className='flex items-center gap-2'>
-              <Activity className='h-6 w-6' />
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
+              <Activity className='h-5 w-5 text-primary' />
+            </div>
+            <div>
               <h2 className='text-2xl font-bold tracking-tight'>
                 Signal Viewer
               </h2>
+              <p className='text-muted-foreground text-sm'>
+                View and manage HVAC sensor signals and control points
+              </p>
             </div>
-            <p className='text-muted-foreground'>
-              View and manage HVAC sensor signals and control points
-            </p>
           </div>
           <Button variant='outline'>Show Changelog</Button>
         </div>

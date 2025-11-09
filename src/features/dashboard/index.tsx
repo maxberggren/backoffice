@@ -10,6 +10,7 @@ import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { LayoutDashboard } from 'lucide-react'
 import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
 
@@ -25,9 +26,19 @@ export function Dashboard() {
       </Header>
 
       {/* ===== Main ===== */}
-      <Main>
-        <div className='mb-2 flex items-center justify-between space-y-2'>
-          <h1 className='text-2xl font-bold tracking-tight'>HVAC Control Dashboard</h1>
+      <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
+              <LayoutDashboard className='h-5 w-5 text-primary' />
+            </div>
+            <div>
+              <h2 className='text-2xl font-bold tracking-tight'>HVAC Control Dashboard</h2>
+              <p className='text-muted-foreground text-sm'>
+                Overview of HVAC system performance and energy savings
+              </p>
+            </div>
+          </div>
           <div className='flex items-center space-x-2'>
             <Button>Export Report</Button>
           </div>
@@ -55,14 +66,14 @@ export function Dashboard() {
                 <CardContent>
                   <div className='text-2xl font-bold'>21.5°C</div>
                   <p className='text-muted-foreground text-xs'>
-                    Target: 22°C across all buildings
+                    Target: 22°C across all properties
                   </p>
                 </CardContent>
               </Card>
               <Card>
                 <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                   <CardTitle className='text-sm font-medium'>
-                    Active Buildings
+                    Active Properties
                   </CardTitle>
                   <svg
                     xmlns='http://www.w3.org/2000/svg'
@@ -148,9 +159,9 @@ export function Dashboard() {
             <div className='grid grid-cols-1 gap-4 lg:grid-cols-7'>
               <Card className='col-span-1 lg:col-span-4'>
                 <CardHeader>
-                  <CardTitle>Temperature Trends</CardTitle>
+                  <CardTitle>Energy Savings</CardTitle>
                   <CardDescription>
-                    Average temperature across all buildings over the last 7 days
+                    Energy savings across all properties
                   </CardDescription>
                 </CardHeader>
                 <CardContent className='ps-2'>

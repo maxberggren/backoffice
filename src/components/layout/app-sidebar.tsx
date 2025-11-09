@@ -10,18 +10,18 @@ import {
 import { sidebarData } from './data/sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
-import { BuildingSwitcher } from './building-switcher'
-import { users as buildings } from '@/features/users/data/users'
+import { PropertySwitcher } from './property-switcher'
+import { users as properties } from '@/features/users/data/users'
 
 export function AppSidebar() {
   const { collapsible, variant } = useLayout()
   return (
     <Sidebar collapsible={collapsible} variant={variant}>
       <SidebarHeader>
-        <BuildingSwitcher buildings={buildings} />
+        <PropertySwitcher properties={properties} />
 
-        {/* Replace <BuildingSwitcher /> with the following <AppTitle />
-         /* if you want to use the normal app title instead of BuildingSwitcher dropdown */}
+        {/* Replace <PropertySwitcher /> with the following <AppTitle />
+         /* if you want to use the normal app title instead of PropertySwitcher dropdown */}
         {/* <AppTitle /> */}
       </SidebarHeader>
       <SidebarContent>

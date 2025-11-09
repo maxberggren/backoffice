@@ -54,7 +54,7 @@ const data = [
 export function Overview() {
   return (
     <ResponsiveContainer width='100%' height={350}>
-      <BarChart data={data}>
+      <BarChart data={data} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
         <XAxis
           dataKey='name'
           stroke='#888888'
@@ -67,7 +67,7 @@ export function Overview() {
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `${value} MWh`}
         />
         <Bar
           dataKey='total'

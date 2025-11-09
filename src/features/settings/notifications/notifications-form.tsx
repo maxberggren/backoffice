@@ -18,16 +18,20 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
 
 const notificationsFormSchema = z.object({
-  type: z.enum(['all', 'mentions', 'none'], {
+  type: z.enum(['all', 'critical', 'none'], {
     error: (iss) =>
       iss.input === undefined
         ? 'Please select a notification type.'
         : undefined,
   }),
   mobile: z.boolean().default(false).optional(),
-  communication_emails: z.boolean().default(false).optional(),
-  social_emails: z.boolean().default(false).optional(),
-  marketing_emails: z.boolean().default(false).optional(),
+  system_alerts: z.boolean().default(true).optional(),
+  performance_warnings: z.boolean().default(true).optional(),
+  maintenance_reminders: z.boolean().default(true).optional(),
+  energy_reports: z.boolean().default(false).optional(),
+  comfort_changes: z.boolean().default(true).optional(),
+  signal_discrepancies: z.boolean().default(true).optional(),
+  ai_recommendations: z.boolean().default(true).optional(),
   security_emails: z.boolean(),
 })
 
@@ -35,9 +39,13 @@ type NotificationsFormValues = z.infer<typeof notificationsFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<NotificationsFormValues> = {
-  communication_emails: false,
-  marketing_emails: false,
-  social_emails: true,
+  system_alerts: true,
+  performance_warnings: true,
+  maintenance_reminders: true,
+  energy_reports: false,
+  comfort_changes: true,
+  signal_discrepancies: true,
+  ai_recommendations: true,
   security_emails: true,
 }
 
@@ -70,15 +78,15 @@ export function NotificationsForm() {
                       <RadioGroupItem value='all' />
                     </FormControl>
                     <FormLabel className='font-normal'>
-                      All new messages
+                      All AI HVAC events
                     </FormLabel>
                   </FormItem>
                   <FormItem className='flex items-center'>
                     <FormControl>
-                      <RadioGroupItem value='mentions' />
+                      <RadioGroupItem value='critical' />
                     </FormControl>
                     <FormLabel className='font-normal'>
-                      Direct messages and mentions
+                      Critical alerts only
                     </FormLabel>
                   </FormItem>
                   <FormItem className='flex items-center'>
@@ -94,19 +102,19 @@ export function NotificationsForm() {
           )}
         />
         <div className='relative'>
-          <h3 className='mb-4 text-lg font-medium'>Email Notifications</h3>
+          <h3 className='mb-4 text-lg font-medium'>AI HVAC Notifications</h3>
           <div className='space-y-4'>
             <FormField
               control={form.control}
-              name='communication_emails'
+              name='system_alerts'
               render={({ field }) => (
                 <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'>
-                      Communication emails
+                      System alerts
                     </FormLabel>
                     <FormDescription>
-                      Receive emails about your account activity.
+                      Equipment failures, critical issues, and system errors.
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -120,15 +128,15 @@ export function NotificationsForm() {
             />
             <FormField
               control={form.control}
-              name='marketing_emails'
+              name='performance_warnings'
               render={({ field }) => (
                 <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
                     <FormLabel className='text-base'>
-                      Marketing emails
+                      Performance warnings
                     </FormLabel>
                     <FormDescription>
-                      Receive emails about new products, features, and more.
+                      Efficiency drops, anomalies, and performance degradation.
                     </FormDescription>
                   </div>
                   <FormControl>
@@ -142,13 +150,103 @@ export function NotificationsForm() {
             />
             <FormField
               control={form.control}
-              name='social_emails'
+              name='maintenance_reminders'
               render={({ field }) => (
                 <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
                   <div className='space-y-0.5'>
-                    <FormLabel className='text-base'>Social emails</FormLabel>
+                    <FormLabel className='text-base'>
+                      Maintenance reminders
+                    </FormLabel>
                     <FormDescription>
-                      Receive emails for friend requests, follows, and more.
+                      Scheduled maintenance and service recommendations.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='energy_reports'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>
+                      Energy savings reports
+                    </FormLabel>
+                    <FormDescription>
+                      Weekly and monthly energy savings summaries.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='comfort_changes'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>
+                      Comfort group changes
+                    </FormLabel>
+                    <FormDescription>
+                      Updates to comfort group configurations and schedules.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='signal_discrepancies'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>
+                      Signal discrepancies
+                    </FormLabel>
+                    <FormDescription>
+                      Read-write mismatches and signal validation issues.
+                    </FormDescription>
+                  </div>
+                  <FormControl>
+                    <Switch
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name='ai_recommendations'
+              render={({ field }) => (
+                <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                  <div className='space-y-0.5'>
+                    <FormLabel className='text-base'>
+                      AI recommendations
+                    </FormLabel>
+                    <FormDescription>
+                      AI-generated optimization suggestions and insights.
                     </FormDescription>
                   </div>
                   <FormControl>

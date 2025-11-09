@@ -178,5 +178,81 @@ export const createSignalColumns = ({
       )
     },
   },
+  {
+    accessorKey: 'signalPosition',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Signal Position" />,
+    cell: ({ row }) => {
+      const signal = row.original
+      return (
+        <Select
+          value={signal.signalPosition || ''}
+          onValueChange={(value) => updateSignal(signal.id, 'signalPosition', value)}
+        >
+          <SelectTrigger className="h-8 w-32">
+            <SelectValue placeholder="Select position" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Input">Input</SelectItem>
+            <SelectItem value="Output">Output</SelectItem>
+            <SelectItem value="Feedback">Feedback</SelectItem>
+            <SelectItem value="Control">Control</SelectItem>
+          </SelectContent>
+        </Select>
+      )
+    },
+  },
+  {
+    accessorKey: 'signalType',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Signal Type" />,
+    cell: ({ row }) => {
+      const signal = row.original
+      return (
+        <Select
+          value={signal.signalType || ''}
+          onValueChange={(value) => updateSignal(signal.id, 'signalType', value)}
+        >
+          <SelectTrigger className="h-8 w-32">
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Analog">Analog</SelectItem>
+            <SelectItem value="Digital">Digital</SelectItem>
+            <SelectItem value="Pulse">Pulse</SelectItem>
+            <SelectItem value="Modbus">Modbus</SelectItem>
+          </SelectContent>
+        </Select>
+      )
+    },
+  },
+  {
+    accessorKey: 'sourceComponent',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Source Component" />,
+    cell: ({ row }) => {
+      const signal = row.original
+      return (
+        <Input
+          value={signal.sourceComponent || ''}
+          onChange={(e) => updateSignal(signal.id, 'sourceComponent', e.target.value)}
+          className="h-8 text-sm"
+          placeholder="e.g., AHU-01"
+        />
+      )
+    },
+  },
+  {
+    accessorKey: 'componentName',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Component Name" />,
+    cell: ({ row }) => {
+      const signal = row.original
+      return (
+        <Input
+          value={signal.componentName || ''}
+          onChange={(e) => updateSignal(signal.id, 'componentName', e.target.value)}
+          className="h-8 text-sm"
+          placeholder="e.g., Air Handler Unit"
+        />
+      )
+    },
+  },
 ]
 

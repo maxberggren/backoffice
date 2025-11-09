@@ -12,6 +12,7 @@ import { Skeleton } from '@/components/ui/skeleton'
 import { format } from 'date-fns'
 import { useEffect, useRef, useState } from 'react'
 import { type TimeSeriesPoint, type GroupData } from '../data/schema'
+import { DEFAULT_LINE_TYPE } from '@/lib/chart-defaults'
 
 interface ComfortGroupsChartProps {
   data: TimeSeriesPoint[]
@@ -152,14 +153,6 @@ export function ComfortGroupsChart({
     setHiddenLines(hidden)
   }
 
-  // Track previous day to avoid repeating day labels
-  const previousDayRef = useRef<string | null>(null)
-
-  // Reset previous day ref when data changes
-  useEffect(() => {
-    previousDayRef.current = null
-  }, [data])
-
   if (isLoading || !data || data.length === 0) {
     return (
       <div>
@@ -178,41 +171,61 @@ export function ComfortGroupsChart({
     }
   })
 
-  // Format timestamp for X-axis - always show HH:MM, show day only when it changes
-  const formatXAxis = (tickItem: string) => {
+  // Custom tick component to render hour on top and date beneath
+  const CustomTick = ({ x, y, payload }: { x: number; y: number; payload: { value: string } }) => {
     try {
-      const date = new Date(tickItem)
-      const currentDay = format(date, 'MMM d')
-      const time = format(date, 'HH:mm')
+      const date = new Date(payload.value)
+      const hour = format(date, 'HH:mm')
+      const dateStr = format(date, 'MMM d')
       
-      // Show day only if it's different from the previous tick
-      if (previousDayRef.current !== currentDay) {
-        previousDayRef.current = currentDay
-        return `${currentDay} ${time}`
-      }
-      
-      // Just show time if same day
-      return time
+      return (
+        <g transform={`translate(${x},${y})`}>
+          <text
+            x={0}
+            y={0}
+            dy={-5}
+            textAnchor='middle'
+            fill={axisColor}
+            fontSize={10}
+          >
+            {hour}
+          </text>
+          <text
+            x={0}
+            y={0}
+            dy={10}
+            textAnchor='middle'
+            fill={axisColor}
+            fontSize={9}
+          >
+            {dateStr}
+          </text>
+        </g>
+      )
     } catch {
-      return tickItem
+      return (
+        <g transform={`translate(${x},${y})`}>
+          <text x={0} y={0} textAnchor='middle' fill={axisColor} fontSize={10}>
+            {payload.value}
+          </text>
+        </g>
+      )
     }
   }
 
   return (
     <div ref={containerRef}>
       <ResponsiveContainer width='100%' height={400}>
-        <LineChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 0 }}>
+        <LineChart data={chartData} margin={{ top: 20, right: 10, left: 0, bottom: 50 }}>
           <CartesianGrid strokeDasharray='3 3' stroke='hsl(var(--muted))' opacity={0.3} />
           <XAxis
             dataKey='timestamp'
             stroke={axisColor}
-            fontSize={12}
+            fontSize={10}
             tickLine={false}
             axisLine={false}
-            tickFormatter={formatXAxis}
-            angle={-45}
-            textAnchor='end'
-            height={60}
+            tick={CustomTick}
+            height={50}
           />
           <YAxis
             stroke={axisColor}
@@ -327,7 +340,7 @@ export function ComfortGroupsChart({
             return (
               <Line
                 key={group.category.id}
-                type='stepAfter'
+                type={DEFAULT_LINE_TYPE}
                 dataKey={group.category.name}
                 stroke={color}
                 strokeWidth={1.5}
@@ -343,7 +356,7 @@ export function ComfortGroupsChart({
           })}
           {/* Min comfort limit - dashed line */}
           <Line
-            type='stepAfter'
+            type={DEFAULT_LINE_TYPE}
             dataKey='minComfortLimit'
             stroke={foregroundColor}
             strokeWidth={1.5}
@@ -358,7 +371,7 @@ export function ComfortGroupsChart({
           />
           {/* Max comfort limit - dashed line (on top) */}
           <Line
-            type='stepAfter'
+            type={DEFAULT_LINE_TYPE}
             dataKey='maxComfortLimit'
             stroke={foregroundColor}
             strokeWidth={1.5}
@@ -373,7 +386,7 @@ export function ComfortGroupsChart({
           />
           {/* Overall average - bold line (on top) */}
           <Line
-            type='stepAfter'
+            type={DEFAULT_LINE_TYPE}
             dataKey='overallAverage'
             stroke={foregroundColor}
             strokeWidth={3}

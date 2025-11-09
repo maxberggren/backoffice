@@ -19,25 +19,25 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { type Building } from '@/features/users/data/schema'
-import { useBuildingStore } from '@/stores/building-store'
+import { type Property } from '@/features/users/data/schema'
+import { usePropertyStore } from '@/stores/property-store'
 import { cn } from '@/lib/utils'
 
-type BuildingSwitcherProps = {
-  buildings: Building[]
+type PropertySwitcherProps = {
+  properties: Property[]
 }
 
-export function BuildingSwitcher({ buildings }: BuildingSwitcherProps) {
+export function PropertySwitcher({ properties }: PropertySwitcherProps) {
   const { isMobile } = useSidebar()
   const [open, setOpen] = React.useState(false)
-  const { selectedBuilding, setSelectedBuilding } = useBuildingStore()
+  const { selectedProperty, setSelectedProperty } = usePropertyStore()
   
-  // Initialize with first building if none selected
+  // Initialize with first property if none selected
   React.useEffect(() => {
-    if (!selectedBuilding && buildings.length > 0) {
-      setSelectedBuilding(buildings[0])
+    if (!selectedProperty && properties.length > 0) {
+      setSelectedProperty(properties[0])
     }
-  }, [selectedBuilding, buildings, setSelectedBuilding])
+  }, [selectedProperty, properties, setSelectedProperty])
 
   return (
     <SidebarMenu>
@@ -58,7 +58,7 @@ export function BuildingSwitcher({ buildings }: BuildingSwitcherProps) {
               <div className='grid flex-1 text-start text-sm leading-tight'>
                 <span className='truncate font-semibold'>Myrspoven</span>
                 <span className='truncate text-xs'>
-                  {selectedBuilding?.name || 'Select building'}
+                  {selectedProperty?.name || 'Select property'}
                 </span>
               </div>
               <ChevronsUpDown className='ms-auto' />
@@ -71,28 +71,28 @@ export function BuildingSwitcher({ buildings }: BuildingSwitcherProps) {
             sideOffset={4}
           >
             <Command>
-              <CommandInput placeholder='Search buildings...' />
+              <CommandInput placeholder='Search properties...' />
               <CommandList>
-                <CommandEmpty>No building found.</CommandEmpty>
+                <CommandEmpty>No property found.</CommandEmpty>
                 <CommandGroup>
-                  {buildings.map((building) => (
+                  {properties.map((property) => (
                     <CommandItem
-                      key={building.id}
-                      value={`${building.name} ${building.company}`}
+                      key={property.id}
+                      value={`${property.name} ${property.company}`}
                       onSelect={() => {
-                        setSelectedBuilding(building)
+                        setSelectedProperty(property)
                         setOpen(false)
                       }}
                       className={cn(
                         'p-2',
-                        selectedBuilding?.id === building.id &&
+                        selectedProperty?.id === property.id &&
                           'bg-accent text-accent-foreground'
                       )}
                     >
                       <div className='flex flex-col'>
-                        <span className='font-medium'>{building.name}</span>
+                        <span className='font-medium'>{property.name}</span>
                         <span className='text-xs text-muted-foreground'>
-                          {building.company}
+                          {property.company}
                         </span>
                       </div>
                     </CommandItem>

@@ -40,7 +40,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Plus, Trash2, Thermometer } from 'lucide-react'
+import { Plus, Trash2, Calendar } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   type ComfortSchedule,
@@ -49,7 +49,7 @@ import {
   type DayOfWeek,
   scheduleIntervalSchema,
 } from './data/schema'
-import { defaultSchedule, getCO2Level, mockAHUs } from './data/schedule'
+import { defaultSchedule, getCO2Level, mockAHUs, mockAHUOperatingHours, getAHUColor } from './data/schedule'
 
 const DAYS_OF_WEEK: DayOfWeek[] = [
   'monday',
@@ -72,6 +72,8 @@ const DAY_LABELS = {
 }
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i)
+// 15-minute intervals: 96 intervals per day (24 hours * 4)
+const QUARTER_HOURS = Array.from({ length: 96 }, (_, i) => i * 15) // minutes since midnight
 
 // Convert time string (HH:MM) to minutes since midnight
 function timeToMinutes(time: string): number {
@@ -85,6 +87,33 @@ function minutesToTime(minutes: number): string {
   const hours = Math.floor(roundedMinutes / 60)
   const mins = roundedMinutes % 60
   return `${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`
+}
+
+// Get color for CO2 level: green < 450, yellow at 470, red at 800
+// Linear transitions between thresholds
+function getCO2Color(co2Level: number): string {
+  // Green: RGB(34, 197, 94) - below 450
+  // Yellow: RGB(234, 179, 8) - at 470
+  // Red: RGB(239, 68, 68) - at 800
+  
+  if (co2Level < 450) {
+    // Pure green
+    return 'rgba(34, 197, 94, 0.3)'
+  } else if (co2Level < 470) {
+    // Transition from green to yellow (450-470)
+    const t = (co2Level - 450) / 20 // 0 to 1
+    const r = Math.round(34 + (234 - 34) * t)
+    const g = Math.round(197 + (179 - 197) * t)
+    const b = Math.round(94 + (8 - 94) * t)
+    return `rgba(${r}, ${g}, ${b}, 0.3)`
+  } else {
+    // Transition from yellow to red (470-800)
+    const t = Math.min((co2Level - 470) / 330, 1) // 0 to 1, capped at 1
+    const r = Math.round(234 + (239 - 234) * t)
+    const g = Math.round(179 + (68 - 179) * t)
+    const b = Math.round(8 + (68 - 8) * t)
+    return `rgba(${r}, ${g}, ${b}, 0.3)`
+  }
 }
 
 // Get intervals for a specific day
@@ -112,7 +141,7 @@ function generateAutomaticIntervals(): ScheduleInterval[] {
       durationMinutes: 0,
       temperatureLowering: 5,
       ahuPressure: 30,
-      ahuTemperature: 18,
+      ahuTemperature: 3,
     })
     
     // Occupied: 08:00-17:00
@@ -124,7 +153,7 @@ function generateAutomaticIntervals(): ScheduleInterval[] {
       durationMinutes: 0,
       temperatureLowering: 0,
       ahuPressure: 80,
-      ahuTemperature: 22,
+      ahuTemperature: 3,
     })
     
     // Evening: 17:00-00:00
@@ -136,7 +165,7 @@ function generateAutomaticIntervals(): ScheduleInterval[] {
       durationMinutes: 0,
       temperatureLowering: 4,
       ahuPressure: 40,
-      ahuTemperature: 20,
+      ahuTemperature: 3,
     })
   }
   
@@ -150,7 +179,7 @@ function generateAutomaticIntervals(): ScheduleInterval[] {
       durationMinutes: 0,
       temperatureLowering: 6,
       ahuPressure: 30,
-      ahuTemperature: 18,
+      ahuTemperature: 3,
     })
   }
   
@@ -176,17 +205,20 @@ export function ComfortSchedule() {
   const [hasDragged, setHasDragged] = useState<boolean>(false)
 
   // Determine current selected AHU based on mode
-  const selectedAHU = isAllAHUsMode ? 'all' : (selectedIndividualAHU || 'none')
+  // When not in "All AHUs" mode, ensure we have a selected AHU (default to first)
+  const effectiveSelectedAHU = isAllAHUsMode 
+    ? 'all' 
+    : (selectedIndividualAHU || mockAHUs[0]?.id || 'none')
 
   // Get current schedule based on selected AHU
-  const schedule = schedules.get(selectedAHU) || (selectedAHU === 'none' ? null : defaultSchedule)
+  const schedule = schedules.get(effectiveSelectedAHU) || (effectiveSelectedAHU === 'none' ? null : defaultSchedule)
   const hasSchedule = schedule !== null
 
   // Update current schedule
   const updateSchedule = useCallback((updates: Partial<ComfortSchedule>) => {
     setSchedules((prev) => {
       const newMap = new Map(prev)
-      const currentAHU = isAllAHUsMode ? 'all' : (selectedIndividualAHU || 'none')
+      const currentAHU = isAllAHUsMode ? 'all' : (selectedIndividualAHU || mockAHUs[0]?.id || 'none')
       if (currentAHU === 'none') return newMap // Can't update if no AHU selected
       const current = newMap.get(currentAHU) || { ...defaultSchedule, ahuId: currentAHU === 'all' ? undefined : currentAHU }
       newMap.set(currentAHU, { ...current, ...updates })
@@ -197,16 +229,29 @@ export function ComfortSchedule() {
   // Handle mode switch change
   const handleModeSwitchChange = (checked: boolean) => {
     setIsAllAHUsMode(checked)
-    // When switching to individual mode, don't auto-select an AHU
-    // User must explicitly select one or leave it unselected
+    // When switching to individual mode, auto-select the first AHU
+    if (!checked && mockAHUs.length > 0) {
+      const firstAHUId = mockAHUs[0].id
+      setSelectedIndividualAHU(firstAHUId)
+      // Create a schedule for the first AHU if it doesn't exist
+      if (!schedules.has(firstAHUId)) {
+        const newSchedule: ComfortSchedule = {
+          ...defaultSchedule,
+          id: `schedule-${firstAHUId}`,
+          name: 'Non-office hours',
+          ahuId: firstAHUId,
+        }
+        setSchedules((prev) => {
+          const newMap = new Map(prev)
+          newMap.set(firstAHUId, newSchedule)
+          return newMap
+        })
+      }
+    }
   }
 
   // Handle individual AHU selection change
-  const handleIndividualAHUChange = (ahuId: string | 'none') => {
-    if (ahuId === 'none') {
-      setSelectedIndividualAHU(null)
-      return
-    }
+  const handleIndividualAHUChange = (ahuId: string) => {
     setSelectedIndividualAHU(ahuId)
     // Create a new schedule for this AHU if it doesn't exist
     if (!schedules.has(ahuId)) {
@@ -234,7 +279,7 @@ export function ComfortSchedule() {
       durationMinutes: 0,
       temperatureLowering: 3,
       ahuPressure: 50,
-      ahuTemperature: 22,
+      ahuTemperature: 3,
     },
   })
 
@@ -291,7 +336,7 @@ export function ComfortSchedule() {
       durationMinutes: 0,
       temperatureLowering: 3,
       ahuPressure: 50,
-      ahuTemperature: 22,
+      ahuTemperature: 3,
     })
     setSelectedInterval(null)
     setIsFormOpen(true)
@@ -607,10 +652,10 @@ export function ComfortSchedule() {
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
         {/* Header Section */}
-        <div className='flex flex-col gap-4'>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
           <div className='flex items-center gap-3'>
             <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
-              <Thermometer className='h-5 w-5 text-primary' />
+              <Calendar className='h-5 w-5 text-primary' />
             </div>
             <div>
               <h2 className='text-2xl font-bold tracking-tight'>AHU Schedule</h2>
@@ -619,9 +664,10 @@ export function ComfortSchedule() {
               </p>
             </div>
           </div>
+        </div>
 
-          {/* Timeline */}
-          <Card>
+        {/* Timeline */}
+        <Card>
             <CardHeader>
               <div className='flex items-center justify-between'>
                 <div>
@@ -669,14 +715,13 @@ export function ComfortSchedule() {
                     </div>
                     {!isAllAHUsMode && (
                       <Select
-                        value={selectedIndividualAHU || 'none'}
-                        onValueChange={(value) => handleIndividualAHUChange(value as string | 'none')}
+                        value={selectedIndividualAHU || mockAHUs[0]?.id}
+                        onValueChange={(value) => handleIndividualAHUChange(value)}
                       >
                         <SelectTrigger className='h-9 w-[200px]'>
                           <SelectValue placeholder='Select AHU' />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value='none'>None (No Schedule)</SelectItem>
                           {mockAHUs.map((ahu) => (
                             <SelectItem key={ahu.id} value={ahu.id}>
                               {ahu.name}
@@ -732,14 +777,15 @@ export function ComfortSchedule() {
                 </Form>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className='overflow-x-auto'>
-                <div className='min-w-[800px]'>
+            <CardContent className='p-0'>
+              <div className='overflow-x-auto px-6 pb-6'>
+                <div className='min-w-[750px]'>
                   {/* Hour Header */}
                   <div className='mb-2 flex border-b pb-2'>
-                    <div className='w-32 flex-shrink-0 font-medium'>Day</div>
+                    <div className='w-24 flex-shrink-0 font-medium'>Day</div>
                     <div className='relative flex-1'>
-                      {HOURS.map((hour) => (
+                      {/* Show every 2 hours to reduce crowding */}
+                      {HOURS.filter((hour) => hour % 2 === 0).map((hour) => (
                         <div
                           key={hour}
                           className='absolute border-l text-muted-foreground text-xs'
@@ -751,113 +797,184 @@ export function ComfortSchedule() {
                     </div>
                   </div>
 
-                  {/* Days and Timeline */}
+                  {/* Days with CO2 Pattern and Schedule Timeline */}
                   {hasSchedule ? (
                     DAYS_OF_WEEK.map((day) => {
                       const dayIntervals = getIntervalsForDay(schedule!.intervals, day)
                       return (
-                       <div
-                         key={day}
-                         className='relative mb-2 flex min-h-[80px] border-b last:border-b-0'
-                       >
-                         {/* Day Label */}
-                         <div className='w-32 flex-shrink-0 py-2 font-medium'>
-                           {DAY_LABELS[day]}
-                         </div>
+                        <div
+                          key={day}
+                          className='mb-4 border-b last:border-b-0 pb-4 last:pb-0'
+                        >
+                          {/* CO2 Pattern Row */}
+                          <div className='relative mb-1 flex min-h-[30px]'>
+                            <div className='w-24 flex-shrink-0 flex flex-col py-2'>
+                              <div className='font-medium'>{DAY_LABELS[day]}</div>
+                              <div className='text-muted-foreground text-xs'>
+                                CO2 Pattern
+                              </div>
+                            </div>
+                            <div className='relative flex-1 py-2'>
+                              <div className='absolute inset-0 flex gap-px px-px'>
+                                {QUARTER_HOURS.map((minutes) => {
+                                  const hour = minutes / 60 // Convert to fractional hours
+                                  const co2Level = getCO2Level(day, hour)
+                                  // Clip y-axis at 430 ppm: 430 ppm = 0%, 520 ppm = 60% (60% of original height)
+                                  const height = Math.min(Math.max(((co2Level - 430) / 90) * 60, 0), 60)
+                                  const timeString = minutesToTime(minutes)
+                                  const color = getCO2Color(co2Level)
+                                  return (
+                                    <div
+                                      key={minutes}
+                                      className='flex-1 rounded-sm'
+                                      style={{
+                                        background: `linear-gradient(to top, ${color} ${height}%, transparent ${height}%)`,
+                                      }}
+                                      title={`${timeString} - CO2: ${Math.round(co2Level)} ppm`}
+                                    />
+                                  )
+                                })}
+                              </div>
+                              {/* Hour Grid Lines */}
+                              <div className='absolute inset-0 flex'>
+                                {HOURS.map((hour) => (
+                                  <div
+                                    key={hour}
+                                    className='absolute border-r border-dashed border-muted/50'
+                                    style={{ left: `${(hour / 24) * 100}%` }}
+                                  />
+                                ))}
+                              </div>
+                              {/* AHU Operating Hours Start/Stop Lines */}
+                              {mockAHUOperatingHours
+                                .filter((ahuHours) => {
+                                  // Show all AHUs when "All AHUs" mode is selected
+                                  if (isAllAHUsMode) return true
+                                  // Show only the selected AHU when a specific one is selected
+                                  if (selectedIndividualAHU) {
+                                    return ahuHours.ahuId === selectedIndividualAHU
+                                  }
+                                  // Don't show any when no AHU is selected
+                                  return false
+                                })
+                                .map((ahuHours) => {
+                                  const dayHours = ahuHours[day]
+                                  if (!dayHours || typeof dayHours === 'string') return null
+                                  
+                                  const ahuName = mockAHUs.find(ahu => ahu.id === ahuHours.ahuId)?.name || `AHU ${ahuHours.ahuId}`
+                                  const color = getAHUColor(ahuHours.ahuId)
+                                  const startMinutes = timeToMinutes(dayHours.startTime)
+                                  const endMinutes = timeToMinutes(dayHours.endTime)
+                                  const startPercent = (startMinutes / (24 * 60)) * 100
+                                  const endPercent = (endMinutes / (24 * 60)) * 100
+                                  
+                                  return (
+                                    <React.Fragment key={ahuHours.ahuId}>
+                                      {/* Start line */}
+                                      <div
+                                        className='absolute top-0 bottom-0 w-0.5 border-l-2 border-dashed z-10 cursor-pointer group opacity-50 hover:opacity-100 transition-opacity'
+                                        style={{ 
+                                          left: `${startPercent}%`,
+                                          borderColor: color,
+                                        }}
+                                        title={`${ahuName} - Start: ${dayHours.startTime}`}
+                                      >
+                                        <div className='absolute left-0 top-full mt-1 px-2 py-1 bg-popover text-popover-foreground text-xs rounded shadow-md opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20'>
+                                          {ahuName} - Start: {dayHours.startTime}
+                                        </div>
+                                      </div>
+                                      {/* End line */}
+                                      <div
+                                        className='absolute top-0 bottom-0 w-0.5 border-l-2 border-dashed z-10 cursor-pointer group opacity-50 hover:opacity-100 transition-opacity'
+                                        style={{ 
+                                          left: `${endPercent}%`,
+                                          borderColor: color,
+                                        }}
+                                        title={`${ahuName} - End: ${dayHours.endTime}`}
+                                      >
+                                        <div className='absolute left-0 top-full mt-1 px-2 py-1 bg-popover text-popover-foreground text-xs rounded shadow-md opacity-0 group-hover:opacity-100 pointer-events-none whitespace-nowrap z-20'>
+                                          {ahuName} - End: {dayHours.endTime}
+                                        </div>
+                                      </div>
+                                    </React.Fragment>
+                                  )
+                                })}
+                            </div>
+                          </div>
 
-                         {/* Timeline Area */}
-                         <div className='relative flex-1 py-2' data-timeline>
-                           {/* CO2 Background Visualization */}
-                           <div className='absolute inset-0 flex gap-0.5 px-0.5'>
-                             {HOURS.map((hour) => {
-                               const co2Level = getCO2Level(day, hour)
-                               const height = Math.min((co2Level / 1200) * 100, 100)
-                               return (
-                                 <div
-                                   key={hour}
-                                   className='flex-1 rounded-sm'
-                                   style={{
-                                     background: `linear-gradient(to top, rgba(128, 128, 128, 0.25) ${height}%, transparent ${height}%)`,
-                                   }}
-                                 />
-                               )
-                             })}
-                           </div>
+                          {/* Schedule Timeline Row */}
+                          <div className='relative flex min-h-[40px]'>
+                            <div className='w-24 flex-shrink-0' />
+                            <div className='relative flex-1 py-1' data-timeline>
+                              {/* Hour Grid Lines */}
+                              <div className='absolute inset-0 flex'>
+                                {HOURS.map((hour) => (
+                                  <div
+                                    key={hour}
+                                    className='flex-1 border-r border-dashed border-muted last:border-r-0'
+                                  />
+                                ))}
+                              </div>
 
-                           {/* Hour Grid Lines */}
-                           <div className='absolute inset-0 flex'>
-                             {HOURS.map((hour) => (
-                               <div
-                                 key={hour}
-                                 className='flex-1 border-r border-dashed border-muted last:border-r-0'
-                               />
-                             ))}
-                           </div>
-
-                           {/* Schedule Blocks */}
-                           {dayIntervals.map((interval) => {
-                             const style = getBlockStyle(interval)
-                             const isSelected = selectedInterval?.id === interval.id
-                             const isDragging = draggedInterval?.id === interval.id
-                             return (
-                               <div
-                                 key={interval.id}
-                                 className={cn(
-                                   'group absolute top-1 bottom-1 rounded border-2 transition-all',
-                                   isSelected || isDragging
-                                     ? 'border-primary bg-primary/20 z-10'
-                                     : 'border-primary/50 bg-primary/10 hover:bg-primary/15',
-                                   isDisabled && 'cursor-not-allowed opacity-50',
-                                   !isDisabled && 'cursor-move'
-                                 )}
-                                 style={style}
-                                 onMouseDown={(e) => !isDisabled && handleBlockMouseDown(e, interval)}
-                                 onClick={(e) => {
-                                   if (!isDisabled && !hasDragged) {
-                                     e.stopPropagation()
-                                     handleEditInterval(interval)
-                                   }
-                                 }}
-                               >
-                                 {/* Left Resize Handle */}
-                                 {!isDisabled && (
-                                   <div
-                                     className='absolute left-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
-                                     onMouseDown={(e) => handleResizeMouseDown(e, interval, 'left')}
-                                   />
-                                 )}
-                                 {/* Right Resize Handle */}
-                                 {!isDisabled && (
-                                   <div
-                                     className='absolute right-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
-                                     onMouseDown={(e) => handleResizeMouseDown(e, interval, 'right')}
-                                   />
-                                 )}
-                                 <div className='flex h-full flex-col justify-between gap-0.5 p-1 text-xs'>
-                                   <div className='font-medium'>
-                                     {(() => {
-                                       const displayedTime = getDisplayedTime(interval)
-                                       return `${displayedTime.startTime} - ${displayedTime.endTime}`
-                                     })()}
-                                   </div>
-                                   <div className='flex flex-col gap-0.5 text-[10px] leading-tight'>
-                                     <div className='text-muted-foreground'>
-                                       Lower: {interval.temperatureLowering}°C
-                                     </div>
-                                     <div className='flex items-center gap-1.5 text-muted-foreground/80'>
-                                       <span>AHU: {interval.ahuPressure}%</span>
-                                       <span>•</span>
-                                       <span>{interval.ahuTemperature}°C</span>
-                                     </div>
-                                   </div>
-                                 </div>
-                               </div>
-                             )
-                           })}
-                         </div>
-                       </div>
-                     )
-                   })
+                              {/* Schedule Blocks */}
+                              {dayIntervals.map((interval) => {
+                                const style = getBlockStyle(interval)
+                                const isSelected = selectedInterval?.id === interval.id
+                                const isDragging = draggedInterval?.id === interval.id
+                                const displayedTime = getDisplayedTime(interval)
+                                return (
+                                  <div
+                                    key={interval.id}
+                                    className={cn(
+                                      'group absolute top-0.5 bottom-0.5 rounded border-2 transition-all flex items-center gap-2',
+                                      isSelected || isDragging
+                                        ? 'border-primary bg-primary/20 z-10'
+                                        : 'border-primary/50 bg-primary/10 hover:bg-primary/15',
+                                      isDisabled && 'cursor-not-allowed opacity-50',
+                                      !isDisabled && 'cursor-move'
+                                    )}
+                                    style={style}
+                                    onMouseDown={(e) => !isDisabled && handleBlockMouseDown(e, interval)}
+                                    onClick={(e) => {
+                                      if (!isDisabled && !hasDragged) {
+                                        e.stopPropagation()
+                                        handleEditInterval(interval)
+                                      }
+                                    }}
+                                  >
+                                    {/* Left Resize Handle */}
+                                    {!isDisabled && (
+                                      <div
+                                        className='absolute left-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
+                                        onMouseDown={(e) => handleResizeMouseDown(e, interval, 'left')}
+                                      />
+                                    )}
+                                    {/* Right Resize Handle */}
+                                    {!isDisabled && (
+                                      <div
+                                        className='absolute right-0 top-0 h-full w-2 cursor-ew-resize bg-primary/30 opacity-0 transition-opacity group-hover:opacity-100'
+                                        onMouseDown={(e) => handleResizeMouseDown(e, interval, 'right')}
+                                      />
+                                    )}
+                                    {/* Text content inside the block: time on left, metadata on right */}
+                                    <div className='flex-1 flex items-center justify-between gap-2 px-1 text-xs'>
+                                      <div className='font-medium whitespace-nowrap'>
+                                        {displayedTime.startTime} - {displayedTime.endTime}
+                                      </div>
+                                      <div className='flex items-center gap-1.5 text-[10px] leading-tight text-muted-foreground/80'>
+                                        <span>Lower: {interval.temperatureLowering}°C</span>
+                                        <span>AHU: {interval.ahuPressure}%</span>
+                                        <span>{interval.ahuTemperature}°C</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      )
+                    })
                   ) : (
                     <div className='flex min-h-[400px] items-center justify-center text-muted-foreground'>
                       <div className='text-center'>
@@ -872,7 +989,6 @@ export function ComfortSchedule() {
               </div>
             </CardContent>
           </Card>
-        </div>
 
         {/* Interval Detail Form Dialog */}
         <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
@@ -992,7 +1108,7 @@ export function ComfortSchedule() {
                         />
                       </FormControl>
                       <div className='text-muted-foreground text-xs'>
-                        Maximum degrees allowed to lower temperature
+                        Maximum degrees allowed to lower comfort
                       </div>
                       <FormMessage />
                     </FormItem>

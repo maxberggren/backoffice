@@ -26,7 +26,7 @@ import {
   TableRow,
 } from '@/components/ui/table'
 import { DataTableViewOptions, DataTableColumnHeader } from '@/components/data-table'
-import { Activity } from 'lucide-react'
+import { Gauge } from 'lucide-react'
 
 export type Discrepancy = {
   id: number
@@ -153,17 +153,19 @@ export function DiscrepanciesViewer() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <div className='flex items-start justify-between'>
-          <div>
-            <div className='flex items-center gap-2'>
-              <Activity className='h-6 w-6' />
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
+              <Gauge className='h-5 w-5 text-primary' />
+            </div>
+            <div>
               <h2 className='text-2xl font-bold tracking-tight'>
                 Read-Write Discrepancies
               </h2>
+              <p className='text-muted-foreground text-sm'>
+                Monitor discrepancies between read and write values for signal variables
+              </p>
             </div>
-            <p className='text-muted-foreground'>
-              Monitor discrepancies between read and write values for signal variables
-            </p>
           </div>
         </div>
 

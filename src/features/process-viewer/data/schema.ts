@@ -11,8 +11,8 @@ export type ProcessStatus = z.infer<typeof processStatusSchema>
 
 const processViewerSchema = z.object({
   id: z.string(),
-  building: z.string(),
-  buildingId: z.string(),
+  property: z.string(),
+  propertyId: z.string(),
   client: z.string(),
   country: z.string(),
   area: z.number().optional(), // squareMeters
@@ -66,7 +66,7 @@ const processViewerSchema = z.object({
   lastWeekUptime: z.number().optional(), // percentage
 })
 
-export type ProcessViewerBuilding = z.infer<typeof processViewerSchema>
+export type ProcessViewerProperty = z.infer<typeof processViewerSchema>
 
 export const processViewerListSchema = z.array(processViewerSchema)
 

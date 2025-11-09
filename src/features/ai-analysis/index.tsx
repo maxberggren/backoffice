@@ -5,7 +5,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, TrendingUp } from 'lucide-react'
 import { ConfigurationSection } from './components/configuration-section'
 import { DateRangeSelectors } from './components/date-range-selectors'
 import { DailyDistributionChart } from './components/daily-distribution-chart'
@@ -152,12 +152,19 @@ export function AIAnalysis() {
       </Header>
 
       <Main className='flex flex-1 flex-col gap-4 sm:gap-6'>
-        <div>
-          <h1 className='text-2xl font-bold tracking-tight'>AI ON vs. OFF</h1>
-          <p className='text-muted-foreground'>
-            Analyze the impact of AI control systems by comparing ON vs OFF states under
-            temperature-normalized conditions
-          </p>
+        <div className='flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between'>
+          <div className='flex items-center gap-3'>
+            <div className='flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10'>
+              <TrendingUp className='h-5 w-5 text-primary' />
+            </div>
+            <div>
+              <h2 className='text-2xl font-bold tracking-tight'>AI ON vs. OFF</h2>
+              <p className='text-muted-foreground text-sm'>
+                Analyze the impact of AI control systems by comparing ON vs OFF states under
+                temperature-normalized conditions
+              </p>
+            </div>
+          </div>
         </div>
 
         <ConfigurationSection

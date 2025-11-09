@@ -55,8 +55,8 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { CalendarIcon, Wrench, Clock, Plus, AlertTriangle, Pencil } from 'lucide-react'
-import { users as buildings } from '@/features/users/data/users'
-import { useBuildingStore } from '@/stores/building-store'
+import { users as properties } from '@/features/users/data/users'
+import { usePropertyStore } from '@/stores/property-store'
 import { showSubmittedData } from '@/lib/show-submitted-data'
 import { cn } from '@/lib/utils'
 
@@ -75,8 +75,8 @@ const maintenanceTypes = [
 // Maintenance entry type
 type MaintenanceEntry = {
   id: string
-  buildingId: string
-  buildingName: string
+  propertyId: string
+  propertyName: string
   maintenanceType: string
   comment: string
   startDate: Date
@@ -86,7 +86,7 @@ type MaintenanceEntry = {
 
 // Form schema
 const maintenanceFormSchema = z.object({
-  buildingId: z.string().min(1, 'Please select a building'),
+  propertyId: z.string().min(1, 'Please select a property'),
   maintenanceType: z.string().min(1, 'Please select a maintenance type'),
   comment: z.string().optional(),
   startDate: z.date(),
@@ -102,7 +102,7 @@ type MaintenanceFormValues = z.infer<typeof maintenanceFormSchema>
 const generateMaintenanceEntries = (
   timePeriod: string,
   filter: 'all' | 'maintenance' | 'faulty',
-  buildingId?: string
+  propertyId?: string
 ): MaintenanceEntry[] => {
   const now = new Date()
   const entries: MaintenanceEntry[] = []
@@ -113,23 +113,23 @@ const generateMaintenanceEntries = (
   else if (timePeriod === '3m') count = 30
   else count = 50
   
-  // Filter buildings by selected building if provided
-  const filteredBuildings = buildingId
-    ? buildings.filter(b => b.id === buildingId)
-    : buildings
+  // Filter properties by selected property if provided
+  const filteredProperties = propertyId
+    ? properties.filter(p => p.id === propertyId)
+    : properties
   
-  if (filteredBuildings.length === 0) return []
+  if (filteredProperties.length === 0) return []
   
   for (let i = 0; i < count; i++) {
-    const building = filteredBuildings[i % filteredBuildings.length]
+    const property = filteredProperties[i % filteredProperties.length]
     const startDate = new Date(now.getTime() - Math.random() * 90 * 24 * 60 * 60 * 1000)
     const endDate = new Date(startDate.getTime() + Math.random() * 7 * 24 * 60 * 60 * 1000)
     const isActive = endDate > now
     
     entries.push({
       id: `maintenance-${i}`,
-      buildingId: building.id,
-      buildingName: building.name,
+      propertyId: property.id,
+      propertyName: property.name,
       maintenanceType: maintenanceTypes[i % maintenanceTypes.length],
       comment: i % 3 === 0 ? `Maintenance note ${i + 1}` : '',
       startDate,
@@ -149,7 +149,7 @@ const generateMaintenanceEntries = (
 }
 
 export function Maintenance() {
-  const { selectedBuilding } = useBuildingStore()
+  const { selectedProperty } = usePropertyStore()
   const [timePeriod, setTimePeriod] = useState('1m')
   const [activeTab, setActiveTab] = useState<'all' | 'maintenance' | 'faulty'>('all')
   const [selectedEntry, setSelectedEntry] = useState<MaintenanceEntry | null>(null)
@@ -157,12 +157,12 @@ export function Maintenance() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isEditMode, setIsEditMode] = useState(false)
   
-  const entries = generateMaintenanceEntries(timePeriod, activeTab, selectedBuilding?.id)
+  const entries = generateMaintenanceEntries(timePeriod, activeTab, selectedProperty?.id)
   
   const form = useForm<MaintenanceFormValues>({
     resolver: zodResolver(maintenanceFormSchema),
     defaultValues: {
-      buildingId: selectedBuilding?.id || '',
+      propertyId: selectedProperty?.id || '',
       maintenanceType: '',
       comment: '',
       startDate: undefined,
@@ -173,7 +173,7 @@ export function Maintenance() {
   const editForm = useForm<MaintenanceFormValues>({
     resolver: zodResolver(maintenanceFormSchema),
     defaultValues: {
-      buildingId: '',
+      propertyId: '',
       maintenanceType: '',
       comment: '',
       startDate: undefined,
@@ -184,7 +184,7 @@ export function Maintenance() {
   const handleSubmit = (data: MaintenanceFormValues) => {
     showSubmittedData(data)
     form.reset({
-      buildingId: selectedBuilding?.id || '',
+      propertyId: selectedProperty?.id || '',
       maintenanceType: '',
       comment: '',
       startDate: undefined,
@@ -203,7 +203,7 @@ export function Maintenance() {
   const handleRowClick = (entry: MaintenanceEntry) => {
     setSelectedEntry(entry)
     editForm.reset({
-      buildingId: entry.buildingId,
+      propertyId: entry.propertyId,
       maintenanceType: entry.maintenanceType,
       comment: entry.comment,
       startDate: entry.startDate,
@@ -254,24 +254,24 @@ export function Maintenance() {
             <div>
               <h2 className='text-2xl font-bold tracking-tight'>Maintenance</h2>
               <p className='text-muted-foreground text-sm'>
-                Manage maintenance periods for {selectedBuilding?.name || 'selected building'}
+                Manage maintenance periods for {selectedProperty?.name || 'selected property'}
               </p>
             </div>
           </div>
-          <Button onClick={() => setIsFormOpen(true)} disabled={!selectedBuilding}>
+          <Button onClick={() => setIsFormOpen(true)} disabled={!selectedProperty}>
             <Plus className='mr-2 h-4 w-4' />
             Add Maintenance
           </Button>
         </div>
 
-        {!selectedBuilding && (
+        {!selectedProperty && (
           <Card>
             <CardContent className='pt-6'>
               <div className='flex flex-col items-center justify-center py-8 text-center'>
                 <Wrench className='h-12 w-12 text-muted-foreground mb-4' />
-                <h3 className='text-lg font-semibold mb-2'>No Building Selected</h3>
+                <h3 className='text-lg font-semibold mb-2'>No Property Selected</h3>
                 <p className='text-muted-foreground text-sm'>
-                  Please select a building from the top left to view and manage maintenance periods.
+                  Please select a property from the top left to view and manage maintenance periods.
                 </p>
               </div>
             </CardContent>
@@ -292,24 +292,24 @@ export function Maintenance() {
                 <div className='grid gap-4 sm:grid-cols-2'>
                   <FormField
                     control={form.control}
-                    name='buildingId'
+                    name='propertyId'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Building</FormLabel>
+                        <FormLabel>Property</FormLabel>
                         <Select 
                           onValueChange={field.onChange} 
-                          defaultValue={selectedBuilding?.id || field.value}
-                          disabled={!!selectedBuilding}
+                          defaultValue={selectedProperty?.id || field.value}
+                          disabled={!!selectedProperty}
                         >
                           <FormControl>
                             <SelectTrigger>
-                              <SelectValue placeholder='---Select Building---' />
+                              <SelectValue placeholder='---Select Property---' />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
-                            {buildings.map((building) => (
-                              <SelectItem key={building.id} value={building.id}>
-                                {building.name}
+                            {properties.map((property) => (
+                              <SelectItem key={property.id} value={property.id}>
+                                {property.name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -499,7 +499,7 @@ export function Maintenance() {
                     <Table>
                       <TableHeader>
                         <TableRow>
-                          <TableHead className='font-semibold'>Building</TableHead>
+                          <TableHead className='font-semibold'>Property</TableHead>
                           <TableHead className='font-semibold'>Maintenance Type</TableHead>
                           <TableHead className='font-semibold'>Start Date</TableHead>
                           <TableHead className='font-semibold'>End Date</TableHead>
@@ -515,7 +515,7 @@ export function Maintenance() {
                             onClick={() => handleRowClick(entry)}
                           >
                             <TableCell className='font-medium'>
-                              {entry.buildingName}
+                              {entry.propertyName}
                             </TableCell>
                             <TableCell>{entry.maintenanceType}</TableCell>
                             <TableCell className='font-mono text-sm'>
@@ -685,7 +685,7 @@ export function Maintenance() {
                           onClick={() => {
                             setIsEditMode(false)
                             editForm.reset({
-                              buildingId: selectedEntry.buildingId,
+                              propertyId: selectedEntry.propertyId,
                               maintenanceType: selectedEntry.maintenanceType,
                               comment: selectedEntry.comment,
                               startDate: selectedEntry.startDate,
@@ -704,8 +704,8 @@ export function Maintenance() {
                     <div className='flex items-center justify-between'>
                       <div className='grid gap-4 sm:grid-cols-2 flex-1'>
                         <div>
-                          <p className='text-sm font-medium text-muted-foreground'>Building</p>
-                          <p className='mt-1 font-medium'>{selectedEntry.buildingName}</p>
+                          <p className='text-sm font-medium text-muted-foreground'>Property</p>
+                          <p className='mt-1 font-medium'>{selectedEntry.propertyName}</p>
                         </div>
                         <div>
                           <p className='text-sm font-medium text-muted-foreground'>Status</p>

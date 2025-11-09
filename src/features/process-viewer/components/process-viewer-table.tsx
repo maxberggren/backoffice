@@ -24,12 +24,12 @@ import {
 import { Button } from '@/components/ui/button'
 import { DataTablePagination, DataTableToolbar } from '@/components/data-table'
 import { Download } from 'lucide-react'
-import { type ProcessViewerBuilding } from '../data/schema'
+import { type ProcessViewerProperty } from '../data/schema'
 import { processViewerColumns as columns } from './process-viewer-columns'
 import { exportTableToCSV } from '@/lib/export-table'
 
 type ProcessViewerTableProps = {
-  data: ProcessViewerBuilding[]
+  data: ProcessViewerProperty[]
   search: Record<string, unknown>
   navigate: NavigateFn
 }
@@ -122,7 +122,7 @@ export function ProcessViewerTable({ data, search, navigate }: ProcessViewerTabl
         <div className="flex-1">
           <DataTableToolbar
             table={table}
-            searchPlaceholder="Search buildings..."
+            searchPlaceholder="Search properties..."
             filters={[
               {
                 columnId: 'isOnline',

@@ -1,35 +1,27 @@
 import {
-  Construction,
   LayoutDashboard,
-  Monitor,
-  Bug,
-  FileX,
   HelpCircle,
-  Lock,
   Bell,
   Thermometer,
   Palette,
-  ServerOff,
   Settings,
   Wrench,
-  UserCog,
-  UserX,
   Users,
-  ShieldCheck,
   GalleryVerticalEnd,
   Building2,
   AlertTriangle,
-  Cpu,
   Activity,
   TrendingUp,
   Calendar,
   Download,
+  Upload,
   Sparkles,
   Table2,
   Layers,
   Gauge,
+  FileText,
+  Brain,
 } from 'lucide-react'
-import { ClerkLogo } from '@/assets/clerk-logo'
 import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
@@ -45,19 +37,19 @@ export const sidebarData: SidebarData = {
       plan: 'AI-Powered',
     },
     {
-      name: 'Building Portfolio A',
+      name: 'Property Portfolio A',
       logo: Building2,
-      plan: '12 Buildings',
+      plan: '12 Properties',
     },
     {
-      name: 'Building Portfolio B',
+      name: 'Property Portfolio B',
       logo: GalleryVerticalEnd,
-      plan: '8 Buildings',
+      plan: '8 Properties',
     },
   ],
   navGroups: [
     {
-      title: 'Monitoring',
+      title: 'Portfolio',
       items: [
         {
           title: 'Dashboard',
@@ -78,17 +70,94 @@ export const sidebarData: SidebarData = {
       ],
     },
     {
-      title: 'Signals',
+      title: 'Property',
       items: [
         {
-          title: 'Signal Viewer',
-          url: '/signals/viewer',
+          title: 'Signals',
           icon: Activity,
+          items: [
+            {
+              title: 'Edit',
+              url: '/signals/viewer',
+              icon: Activity,
+            },
+            {
+              title: 'Export',
+              url: '/signals/export',
+              icon: Download,
+            },
+            {
+              title: 'Import',
+              url: '/signals/import',
+              icon: Upload,
+            },
+          ],
         },
         {
-          title: 'Export to Excel',
-          url: '/signals/export',
-          icon: Download,
+          title: 'Maintenance',
+          url: '/maintenance',
+          icon: Wrench,
+        },
+        {
+          title: 'Configuration',
+          icon: Building2,
+          items: [
+            {
+              title: 'General',
+              url: '/buildings/:propertyId/config',
+              icon: Settings,
+              dynamicUrl: true,
+            },
+            {
+              title: 'AI Settings',
+              url: '/buildings/:propertyId/config/ai-settings',
+              icon: Sparkles,
+              dynamicUrl: true,
+            },
+            {
+              title: 'Features',
+              url: '/buildings/:propertyId/config/features',
+              icon: Layers,
+              dynamicUrl: true,
+            },
+            {
+              title: 'Processes',
+              url: '/buildings/:propertyId/config/processes',
+              icon: Table2,
+              dynamicUrl: true,
+            },
+            {
+              title: 'Blueprints',
+              url: '/buildings/:propertyId/config/blueprints',
+              icon: FileText,
+              dynamicUrl: true,
+            },
+          ],
+        },
+        {
+          title: 'AHU Schedule',
+          url: '/ahu-schedule',
+          icon: Calendar,
+        },
+      ],
+    },
+    {
+      title: 'Insights',
+      items: [
+        {
+          title: 'ON vs OFF',
+          url: '/analysis/ai-on-vs-off',
+          icon: TrendingUp,
+        },
+        {
+          title: 'Group Comfort',
+          url: '/analysis/comfort-groups',
+          icon: Layers,
+        },
+        {
+          title: 'AI vs Baseline',
+          url: '/analysis/ai-vs-baseline',
+          icon: TrendingUp,
         },
         {
           title: 'Read-Write Discrepancies',
@@ -101,40 +170,14 @@ export const sidebarData: SidebarData = {
       title: 'AI',
       items: [
         {
-          title: 'AI Output',
+          title: 'Training Metrics',
+          url: '/analysis/ai-training-metrics',
+          icon: Brain,
+        },
+        {
+          title: 'Output',
           url: '/signals/ai-output',
           icon: Sparkles,
-        },
-        {
-          title: 'AI ON vs OFF',
-          url: '/analysis/ai-on-vs-off',
-          icon: TrendingUp,
-        },
-        {
-          title: 'Comfort Groups',
-          url: '/analysis/comfort-groups',
-          icon: Layers,
-        },
-        {
-          title: 'Maintenance',
-          url: '/maintenance',
-          icon: Wrench,
-        },
-        {
-          title: 'AI Models',
-          url: '/apps',
-          icon: Cpu,
-        },
-        {
-          title: 'Configuration',
-          url: '/buildings/:buildingId/config',
-          icon: Building2,
-          dynamicUrl: true,
-        },
-        {
-          title: 'AHU Schedule',
-          url: '/ahu-schedule',
-          icon: Calendar,
         },
       ],
     },
@@ -146,24 +189,6 @@ export const sidebarData: SidebarData = {
           url: '/clerk/user-management',
           icon: Users,
         },
-        {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
-            },
-            {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
-            },
-            {
-              title: 'User Management',
-              url: '/clerk/user-management',
-            },
-          ],
-        },
       ],
     },
     {
@@ -174,16 +199,6 @@ export const sidebarData: SidebarData = {
           icon: Settings,
           items: [
             {
-              title: 'Profile',
-              url: '/settings',
-              icon: UserCog,
-            },
-            {
-              title: 'AI Configuration',
-              url: '/settings/account',
-              icon: Cpu,
-            },
-            {
               title: 'Appearance',
               url: '/settings/appearance',
               icon: Palette,
@@ -193,74 +208,12 @@ export const sidebarData: SidebarData = {
               url: '/settings/notifications',
               icon: Bell,
             },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: Monitor,
-            },
           ],
         },
         {
           title: 'Documentation',
           url: '/help-center',
           icon: HelpCircle,
-        },
-        {
-          title: 'Error Pages',
-          icon: Bug,
-          items: [
-            {
-              title: 'Unauthorized',
-              url: '/errors/unauthorized',
-              icon: Lock,
-            },
-            {
-              title: 'Forbidden',
-              url: '/errors/forbidden',
-              icon: UserX,
-            },
-            {
-              title: 'Not Found',
-              url: '/errors/not-found',
-              icon: FileX,
-            },
-            {
-              title: 'Server Error',
-              url: '/errors/internal-server-error',
-              icon: ServerOff,
-            },
-            {
-              title: 'Maintenance',
-              url: '/errors/maintenance-error',
-              icon: Construction,
-            },
-          ],
-        },
-        {
-          title: 'Auth Pages',
-          icon: ShieldCheck,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/sign-in',
-            },
-            {
-              title: 'Sign In (2 Col)',
-              url: '/sign-in-2',
-            },
-            {
-              title: 'Sign Up',
-              url: '/sign-up',
-            },
-            {
-              title: 'Forgot Password',
-              url: '/forgot-password',
-            },
-            {
-              title: 'OTP',
-              url: '/otp',
-            },
-          ],
         },
       ],
     },

@@ -39,6 +39,7 @@ import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedUsersBuildingIdRouteImport } from './routes/_authenticated/users/$buildingId'
 import { Route as AuthenticatedSignalsViewerRouteImport } from './routes/_authenticated/signals/viewer'
+import { Route as AuthenticatedSignalsImportRouteImport } from './routes/_authenticated/signals/import'
 import { Route as AuthenticatedSignalsExportRouteImport } from './routes/_authenticated/signals/export'
 import { Route as AuthenticatedSignalsDiscrepanciesRouteImport } from './routes/_authenticated/signals/discrepancies'
 import { Route as AuthenticatedSignalsAiOutputRouteImport } from './routes/_authenticated/signals/ai-output'
@@ -48,8 +49,16 @@ import { Route as AuthenticatedSettingsAppearanceRouteImport } from './routes/_a
 import { Route as AuthenticatedSettingsAccountRouteImport } from './routes/_authenticated/settings/account'
 import { Route as AuthenticatedErrorsErrorRouteImport } from './routes/_authenticated/errors/$error'
 import { Route as AuthenticatedAnalysisComfortGroupsIndexRouteImport } from './routes/_authenticated/analysis/comfort-groups/index'
+import { Route as AuthenticatedAnalysisAiVsBaselineIndexRouteImport } from './routes/_authenticated/analysis/ai-vs-baseline/index'
+import { Route as AuthenticatedAnalysisAiTrainingMetricsIndexRouteImport } from './routes/_authenticated/analysis/ai-training-metrics/index'
 import { Route as AuthenticatedAnalysisAiOnVsOffIndexRouteImport } from './routes/_authenticated/analysis/ai-on-vs-off/index'
-import { Route as AuthenticatedBuildingsBuildingIdConfigRouteImport } from './routes/_authenticated/buildings/$buildingId/config'
+import { Route as AuthenticatedBuildingsBuildingIdConfigRouteRouteImport } from './routes/_authenticated/buildings/$buildingId/config/route'
+import { Route as AuthenticatedBuildingsBuildingIdConfigIndexRouteImport } from './routes/_authenticated/buildings/$buildingId/config/index'
+import { Route as AuthenticatedBuildingsBuildingIdConfigProcessesRouteImport } from './routes/_authenticated/buildings/$buildingId/config/processes'
+import { Route as AuthenticatedBuildingsBuildingIdConfigFeaturesRouteImport } from './routes/_authenticated/buildings/$buildingId/config/features'
+import { Route as AuthenticatedBuildingsBuildingIdConfigBlueprintsRouteImport } from './routes/_authenticated/buildings/$buildingId/config/blueprints'
+import { Route as AuthenticatedBuildingsBuildingIdConfigAiSettingsRouteImport } from './routes/_authenticated/buildings/$buildingId/config/ai-settings'
+import { Route as AuthenticatedBuildingsBuildingIdConfigAiBaselineRouteImport } from './routes/_authenticated/buildings/$buildingId/config/ai-baseline'
 
 const ClerkRouteRoute = ClerkRouteRouteImport.update({
   id: '/clerk',
@@ -207,6 +216,12 @@ const AuthenticatedSignalsViewerRoute =
     path: '/signals/viewer',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedSignalsImportRoute =
+  AuthenticatedSignalsImportRouteImport.update({
+    id: '/signals/import',
+    path: '/signals/import',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedSignalsExportRoute =
   AuthenticatedSignalsExportRouteImport.update({
     id: '/signals/export',
@@ -261,17 +276,65 @@ const AuthenticatedAnalysisComfortGroupsIndexRoute =
     path: '/analysis/comfort-groups/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAnalysisAiVsBaselineIndexRoute =
+  AuthenticatedAnalysisAiVsBaselineIndexRouteImport.update({
+    id: '/analysis/ai-vs-baseline/',
+    path: '/analysis/ai-vs-baseline/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedAnalysisAiTrainingMetricsIndexRoute =
+  AuthenticatedAnalysisAiTrainingMetricsIndexRouteImport.update({
+    id: '/analysis/ai-training-metrics/',
+    path: '/analysis/ai-training-metrics/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAnalysisAiOnVsOffIndexRoute =
   AuthenticatedAnalysisAiOnVsOffIndexRouteImport.update({
     id: '/analysis/ai-on-vs-off/',
     path: '/analysis/ai-on-vs-off/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedBuildingsBuildingIdConfigRoute =
-  AuthenticatedBuildingsBuildingIdConfigRouteImport.update({
+const AuthenticatedBuildingsBuildingIdConfigRouteRoute =
+  AuthenticatedBuildingsBuildingIdConfigRouteRouteImport.update({
     id: '/buildings/$buildingId/config',
     path: '/buildings/$buildingId/config',
     getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigIndexRoute =
+  AuthenticatedBuildingsBuildingIdConfigIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedBuildingsBuildingIdConfigRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigProcessesRoute =
+  AuthenticatedBuildingsBuildingIdConfigProcessesRouteImport.update({
+    id: '/processes',
+    path: '/processes',
+    getParentRoute: () => AuthenticatedBuildingsBuildingIdConfigRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigFeaturesRoute =
+  AuthenticatedBuildingsBuildingIdConfigFeaturesRouteImport.update({
+    id: '/features',
+    path: '/features',
+    getParentRoute: () => AuthenticatedBuildingsBuildingIdConfigRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute =
+  AuthenticatedBuildingsBuildingIdConfigBlueprintsRouteImport.update({
+    id: '/blueprints',
+    path: '/blueprints',
+    getParentRoute: () => AuthenticatedBuildingsBuildingIdConfigRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute =
+  AuthenticatedBuildingsBuildingIdConfigAiSettingsRouteImport.update({
+    id: '/ai-settings',
+    path: '/ai-settings',
+    getParentRoute: () => AuthenticatedBuildingsBuildingIdConfigRouteRoute,
+  } as any)
+const AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute =
+  AuthenticatedBuildingsBuildingIdConfigAiBaselineRouteImport.update({
+    id: '/ai-baseline',
+    path: '/ai-baseline',
+    getParentRoute: () => AuthenticatedBuildingsBuildingIdConfigRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -297,6 +360,7 @@ export interface FileRoutesByFullPath {
   '/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
   '/signals/discrepancies': typeof AuthenticatedSignalsDiscrepanciesRoute
   '/signals/export': typeof AuthenticatedSignalsExportRoute
+  '/signals/import': typeof AuthenticatedSignalsImportRoute
   '/signals/viewer': typeof AuthenticatedSignalsViewerRoute
   '/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -311,9 +375,17 @@ export interface FileRoutesByFullPath {
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
-  '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRouteRouteWithChildren
   '/analysis/ai-on-vs-off': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  '/analysis/ai-training-metrics': typeof AuthenticatedAnalysisAiTrainingMetricsIndexRoute
+  '/analysis/ai-vs-baseline': typeof AuthenticatedAnalysisAiVsBaselineIndexRoute
   '/analysis/comfort-groups': typeof AuthenticatedAnalysisComfortGroupsIndexRoute
+  '/buildings/$buildingId/config/ai-baseline': typeof AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute
+  '/buildings/$buildingId/config/ai-settings': typeof AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute
+  '/buildings/$buildingId/config/blueprints': typeof AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute
+  '/buildings/$buildingId/config/features': typeof AuthenticatedBuildingsBuildingIdConfigFeaturesRoute
+  '/buildings/$buildingId/config/processes': typeof AuthenticatedBuildingsBuildingIdConfigProcessesRoute
+  '/buildings/$buildingId/config/': typeof AuthenticatedBuildingsBuildingIdConfigIndexRoute
 }
 export interface FileRoutesByTo {
   '/clerk': typeof ClerkAuthenticatedRouteRouteWithChildren
@@ -336,6 +408,7 @@ export interface FileRoutesByTo {
   '/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
   '/signals/discrepancies': typeof AuthenticatedSignalsDiscrepanciesRoute
   '/signals/export': typeof AuthenticatedSignalsExportRoute
+  '/signals/import': typeof AuthenticatedSignalsImportRoute
   '/signals/viewer': typeof AuthenticatedSignalsViewerRoute
   '/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -350,9 +423,16 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
-  '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
   '/analysis/ai-on-vs-off': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  '/analysis/ai-training-metrics': typeof AuthenticatedAnalysisAiTrainingMetricsIndexRoute
+  '/analysis/ai-vs-baseline': typeof AuthenticatedAnalysisAiVsBaselineIndexRoute
   '/analysis/comfort-groups': typeof AuthenticatedAnalysisComfortGroupsIndexRoute
+  '/buildings/$buildingId/config/ai-baseline': typeof AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute
+  '/buildings/$buildingId/config/ai-settings': typeof AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute
+  '/buildings/$buildingId/config/blueprints': typeof AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute
+  '/buildings/$buildingId/config/features': typeof AuthenticatedBuildingsBuildingIdConfigFeaturesRoute
+  '/buildings/$buildingId/config/processes': typeof AuthenticatedBuildingsBuildingIdConfigProcessesRoute
+  '/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -380,6 +460,7 @@ export interface FileRoutesById {
   '/_authenticated/signals/ai-output': typeof AuthenticatedSignalsAiOutputRoute
   '/_authenticated/signals/discrepancies': typeof AuthenticatedSignalsDiscrepanciesRoute
   '/_authenticated/signals/export': typeof AuthenticatedSignalsExportRoute
+  '/_authenticated/signals/import': typeof AuthenticatedSignalsImportRoute
   '/_authenticated/signals/viewer': typeof AuthenticatedSignalsViewerRoute
   '/_authenticated/users/$buildingId': typeof AuthenticatedUsersBuildingIdRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
@@ -394,9 +475,17 @@ export interface FileRoutesById {
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
-  '/_authenticated/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  '/_authenticated/buildings/$buildingId/config': typeof AuthenticatedBuildingsBuildingIdConfigRouteRouteWithChildren
   '/_authenticated/analysis/ai-on-vs-off/': typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  '/_authenticated/analysis/ai-training-metrics/': typeof AuthenticatedAnalysisAiTrainingMetricsIndexRoute
+  '/_authenticated/analysis/ai-vs-baseline/': typeof AuthenticatedAnalysisAiVsBaselineIndexRoute
   '/_authenticated/analysis/comfort-groups/': typeof AuthenticatedAnalysisComfortGroupsIndexRoute
+  '/_authenticated/buildings/$buildingId/config/ai-baseline': typeof AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute
+  '/_authenticated/buildings/$buildingId/config/ai-settings': typeof AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute
+  '/_authenticated/buildings/$buildingId/config/blueprints': typeof AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute
+  '/_authenticated/buildings/$buildingId/config/features': typeof AuthenticatedBuildingsBuildingIdConfigFeaturesRoute
+  '/_authenticated/buildings/$buildingId/config/processes': typeof AuthenticatedBuildingsBuildingIdConfigProcessesRoute
+  '/_authenticated/buildings/$buildingId/config/': typeof AuthenticatedBuildingsBuildingIdConfigIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -423,6 +512,7 @@ export interface FileRouteTypes {
     | '/signals/ai-output'
     | '/signals/discrepancies'
     | '/signals/export'
+    | '/signals/import'
     | '/signals/viewer'
     | '/users/$buildingId'
     | '/clerk/sign-in'
@@ -439,7 +529,15 @@ export interface FileRouteTypes {
     | '/users'
     | '/buildings/$buildingId/config'
     | '/analysis/ai-on-vs-off'
+    | '/analysis/ai-training-metrics'
+    | '/analysis/ai-vs-baseline'
     | '/analysis/comfort-groups'
+    | '/buildings/$buildingId/config/ai-baseline'
+    | '/buildings/$buildingId/config/ai-settings'
+    | '/buildings/$buildingId/config/blueprints'
+    | '/buildings/$buildingId/config/features'
+    | '/buildings/$buildingId/config/processes'
+    | '/buildings/$buildingId/config/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/clerk'
@@ -462,6 +560,7 @@ export interface FileRouteTypes {
     | '/signals/ai-output'
     | '/signals/discrepancies'
     | '/signals/export'
+    | '/signals/import'
     | '/signals/viewer'
     | '/users/$buildingId'
     | '/clerk/sign-in'
@@ -476,9 +575,16 @@ export interface FileRouteTypes {
     | '/settings'
     | '/tasks'
     | '/users'
-    | '/buildings/$buildingId/config'
     | '/analysis/ai-on-vs-off'
+    | '/analysis/ai-training-metrics'
+    | '/analysis/ai-vs-baseline'
     | '/analysis/comfort-groups'
+    | '/buildings/$buildingId/config/ai-baseline'
+    | '/buildings/$buildingId/config/ai-settings'
+    | '/buildings/$buildingId/config/blueprints'
+    | '/buildings/$buildingId/config/features'
+    | '/buildings/$buildingId/config/processes'
+    | '/buildings/$buildingId/config'
   id:
     | '__root__'
     | '/_authenticated'
@@ -505,6 +611,7 @@ export interface FileRouteTypes {
     | '/_authenticated/signals/ai-output'
     | '/_authenticated/signals/discrepancies'
     | '/_authenticated/signals/export'
+    | '/_authenticated/signals/import'
     | '/_authenticated/signals/viewer'
     | '/_authenticated/users/$buildingId'
     | '/clerk/(auth)/sign-in'
@@ -521,7 +628,15 @@ export interface FileRouteTypes {
     | '/_authenticated/users/'
     | '/_authenticated/buildings/$buildingId/config'
     | '/_authenticated/analysis/ai-on-vs-off/'
+    | '/_authenticated/analysis/ai-training-metrics/'
+    | '/_authenticated/analysis/ai-vs-baseline/'
     | '/_authenticated/analysis/comfort-groups/'
+    | '/_authenticated/buildings/$buildingId/config/ai-baseline'
+    | '/_authenticated/buildings/$buildingId/config/ai-settings'
+    | '/_authenticated/buildings/$buildingId/config/blueprints'
+    | '/_authenticated/buildings/$buildingId/config/features'
+    | '/_authenticated/buildings/$buildingId/config/processes'
+    | '/_authenticated/buildings/$buildingId/config/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -751,6 +866,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSignalsViewerRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/signals/import': {
+      id: '/_authenticated/signals/import'
+      path: '/signals/import'
+      fullPath: '/signals/import'
+      preLoaderRoute: typeof AuthenticatedSignalsImportRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/signals/export': {
       id: '/_authenticated/signals/export'
       path: '/signals/export'
@@ -814,6 +936,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAnalysisComfortGroupsIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/analysis/ai-vs-baseline/': {
+      id: '/_authenticated/analysis/ai-vs-baseline/'
+      path: '/analysis/ai-vs-baseline'
+      fullPath: '/analysis/ai-vs-baseline'
+      preLoaderRoute: typeof AuthenticatedAnalysisAiVsBaselineIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/analysis/ai-training-metrics/': {
+      id: '/_authenticated/analysis/ai-training-metrics/'
+      path: '/analysis/ai-training-metrics'
+      fullPath: '/analysis/ai-training-metrics'
+      preLoaderRoute: typeof AuthenticatedAnalysisAiTrainingMetricsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/analysis/ai-on-vs-off/': {
       id: '/_authenticated/analysis/ai-on-vs-off/'
       path: '/analysis/ai-on-vs-off'
@@ -825,8 +961,50 @@ declare module '@tanstack/react-router' {
       id: '/_authenticated/buildings/$buildingId/config'
       path: '/buildings/$buildingId/config'
       fullPath: '/buildings/$buildingId/config'
-      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteImport
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config/': {
+      id: '/_authenticated/buildings/$buildingId/config/'
+      path: '/'
+      fullPath: '/buildings/$buildingId/config/'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigIndexRouteImport
+      parentRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config/processes': {
+      id: '/_authenticated/buildings/$buildingId/config/processes'
+      path: '/processes'
+      fullPath: '/buildings/$buildingId/config/processes'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigProcessesRouteImport
+      parentRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config/features': {
+      id: '/_authenticated/buildings/$buildingId/config/features'
+      path: '/features'
+      fullPath: '/buildings/$buildingId/config/features'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigFeaturesRouteImport
+      parentRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config/blueprints': {
+      id: '/_authenticated/buildings/$buildingId/config/blueprints'
+      path: '/blueprints'
+      fullPath: '/buildings/$buildingId/config/blueprints'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigBlueprintsRouteImport
+      parentRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config/ai-settings': {
+      id: '/_authenticated/buildings/$buildingId/config/ai-settings'
+      path: '/ai-settings'
+      fullPath: '/buildings/$buildingId/config/ai-settings'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigAiSettingsRouteImport
+      parentRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRoute
+    }
+    '/_authenticated/buildings/$buildingId/config/ai-baseline': {
+      id: '/_authenticated/buildings/$buildingId/config/ai-baseline'
+      path: '/ai-baseline'
+      fullPath: '/buildings/$buildingId/config/ai-baseline'
+      preLoaderRoute: typeof AuthenticatedBuildingsBuildingIdConfigAiBaselineRouteImport
+      parentRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRoute
     }
   }
 }
@@ -854,6 +1032,36 @@ const AuthenticatedSettingsRouteRouteWithChildren =
     AuthenticatedSettingsRouteRouteChildren,
   )
 
+interface AuthenticatedBuildingsBuildingIdConfigRouteRouteChildren {
+  AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute: typeof AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute
+  AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute: typeof AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute
+  AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute: typeof AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute
+  AuthenticatedBuildingsBuildingIdConfigFeaturesRoute: typeof AuthenticatedBuildingsBuildingIdConfigFeaturesRoute
+  AuthenticatedBuildingsBuildingIdConfigProcessesRoute: typeof AuthenticatedBuildingsBuildingIdConfigProcessesRoute
+  AuthenticatedBuildingsBuildingIdConfigIndexRoute: typeof AuthenticatedBuildingsBuildingIdConfigIndexRoute
+}
+
+const AuthenticatedBuildingsBuildingIdConfigRouteRouteChildren: AuthenticatedBuildingsBuildingIdConfigRouteRouteChildren =
+  {
+    AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute:
+      AuthenticatedBuildingsBuildingIdConfigAiBaselineRoute,
+    AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute:
+      AuthenticatedBuildingsBuildingIdConfigAiSettingsRoute,
+    AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute:
+      AuthenticatedBuildingsBuildingIdConfigBlueprintsRoute,
+    AuthenticatedBuildingsBuildingIdConfigFeaturesRoute:
+      AuthenticatedBuildingsBuildingIdConfigFeaturesRoute,
+    AuthenticatedBuildingsBuildingIdConfigProcessesRoute:
+      AuthenticatedBuildingsBuildingIdConfigProcessesRoute,
+    AuthenticatedBuildingsBuildingIdConfigIndexRoute:
+      AuthenticatedBuildingsBuildingIdConfigIndexRoute,
+  }
+
+const AuthenticatedBuildingsBuildingIdConfigRouteRouteWithChildren =
+  AuthenticatedBuildingsBuildingIdConfigRouteRoute._addFileChildren(
+    AuthenticatedBuildingsBuildingIdConfigRouteRouteChildren,
+  )
+
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedSettingsRouteRoute: typeof AuthenticatedSettingsRouteRouteWithChildren
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
@@ -861,6 +1069,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedSignalsAiOutputRoute: typeof AuthenticatedSignalsAiOutputRoute
   AuthenticatedSignalsDiscrepanciesRoute: typeof AuthenticatedSignalsDiscrepanciesRoute
   AuthenticatedSignalsExportRoute: typeof AuthenticatedSignalsExportRoute
+  AuthenticatedSignalsImportRoute: typeof AuthenticatedSignalsImportRoute
   AuthenticatedSignalsViewerRoute: typeof AuthenticatedSignalsViewerRoute
   AuthenticatedUsersBuildingIdRoute: typeof AuthenticatedUsersBuildingIdRoute
   AuthenticatedAhuScheduleIndexRoute: typeof AuthenticatedAhuScheduleIndexRoute
@@ -871,8 +1080,10 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedProcessViewerIndexRoute: typeof AuthenticatedProcessViewerIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
-  AuthenticatedBuildingsBuildingIdConfigRoute: typeof AuthenticatedBuildingsBuildingIdConfigRoute
+  AuthenticatedBuildingsBuildingIdConfigRouteRoute: typeof AuthenticatedBuildingsBuildingIdConfigRouteRouteWithChildren
   AuthenticatedAnalysisAiOnVsOffIndexRoute: typeof AuthenticatedAnalysisAiOnVsOffIndexRoute
+  AuthenticatedAnalysisAiTrainingMetricsIndexRoute: typeof AuthenticatedAnalysisAiTrainingMetricsIndexRoute
+  AuthenticatedAnalysisAiVsBaselineIndexRoute: typeof AuthenticatedAnalysisAiVsBaselineIndexRoute
   AuthenticatedAnalysisComfortGroupsIndexRoute: typeof AuthenticatedAnalysisComfortGroupsIndexRoute
 }
 
@@ -884,6 +1095,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedSignalsDiscrepanciesRoute:
     AuthenticatedSignalsDiscrepanciesRoute,
   AuthenticatedSignalsExportRoute: AuthenticatedSignalsExportRoute,
+  AuthenticatedSignalsImportRoute: AuthenticatedSignalsImportRoute,
   AuthenticatedSignalsViewerRoute: AuthenticatedSignalsViewerRoute,
   AuthenticatedUsersBuildingIdRoute: AuthenticatedUsersBuildingIdRoute,
   AuthenticatedAhuScheduleIndexRoute: AuthenticatedAhuScheduleIndexRoute,
@@ -894,10 +1106,14 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedProcessViewerIndexRoute: AuthenticatedProcessViewerIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
-  AuthenticatedBuildingsBuildingIdConfigRoute:
-    AuthenticatedBuildingsBuildingIdConfigRoute,
+  AuthenticatedBuildingsBuildingIdConfigRouteRoute:
+    AuthenticatedBuildingsBuildingIdConfigRouteRouteWithChildren,
   AuthenticatedAnalysisAiOnVsOffIndexRoute:
     AuthenticatedAnalysisAiOnVsOffIndexRoute,
+  AuthenticatedAnalysisAiTrainingMetricsIndexRoute:
+    AuthenticatedAnalysisAiTrainingMetricsIndexRoute,
+  AuthenticatedAnalysisAiVsBaselineIndexRoute:
+    AuthenticatedAnalysisAiVsBaselineIndexRoute,
   AuthenticatedAnalysisComfortGroupsIndexRoute:
     AuthenticatedAnalysisComfortGroupsIndexRoute,
 }

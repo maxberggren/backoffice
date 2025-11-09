@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Slider } from '@/components/ui/slider'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Card,
   CardContent,
@@ -32,8 +31,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import { usePropertyStore } from '@/stores/property-store'
 
-const buildingDetailSchema = z.object({
+const propertyDetailSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   lat: z.string(),
@@ -54,16 +54,16 @@ const buildingDetailSchema = z.object({
   aiFreedom: z.number().min(0).max(100),
   bidailyOffline: z.boolean(),
   autoComfortScheduleObservables: z.number(),
-  autoComfortScheduleLBGP: z.number().min(0).max(100),
+  autoComfortScheduleLBGP: z.boolean(),
   autoComfortScheduleLBGT: z.number(),
   indoorClimateBaseline: z.boolean(),
   heatWithVentilation: z.boolean(),
 })
 
-type BuildingDetailValues = z.infer<typeof buildingDetailSchema>
+type PropertyDetailValues = z.infer<typeof propertyDetailSchema>
 
-interface BuildingDetailFormProps {
-  buildingId?: string
+interface PropertyDetailFormProps {
+  propertyId?: string
 }
 
 function InfoTooltip({ content }: { content: string }) {
@@ -85,17 +85,17 @@ function InfoTooltip({ content }: { content: string }) {
   )
 }
 
-export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormProps) {
-  const [activeTab, setActiveTab] = useState('settings')
+export function PropertyDetailForm({ propertyId = '1126' }: PropertyDetailFormProps) {
+  const { selectedProperty } = usePropertyStore()
 
-  const form = useForm<BuildingDetailValues>({
-    resolver: zodResolver(buildingDetailSchema),
+  const form = useForm<PropertyDetailValues>({
+    resolver: zodResolver(propertyDetailSchema),
     defaultValues: {
-      id: buildingId,
-      name: 'Atrium Flora',
+      id: propertyId,
+      name: selectedProperty?.name || '',
       lat: '50.07965',
       long: '14.45357',
-      city: 'Capital City of Prague',
+      city: selectedProperty?.city || '',
       country: 'Czechia',
       timezone: 'Europe/Prague',
       squareMeters: '36800',
@@ -111,28 +111,28 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
       aiFreedom: 100.0,
       bidailyOffline: false,
       autoComfortScheduleObservables: 0.0,
-      autoComfortScheduleLBGP: 0.0,
+      autoComfortScheduleLBGP: false,
       autoComfortScheduleLBGT: 0.0,
       indoorClimateBaseline: false,
       heatWithVentilation: false,
     },
   })
 
-  function onSubmit(data: BuildingDetailValues) {
+  // Update form when selected property changes
+  useEffect(() => {
+    if (selectedProperty) {
+      form.setValue('name', selectedProperty.name)
+      form.setValue('city', selectedProperty.city)
+      form.setValue('id', selectedProperty.id)
+    }
+  }, [selectedProperty, form])
+
+  function onSubmit(data: PropertyDetailValues) {
     showSubmittedData(data)
   }
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className='space-y-6'>
-      <TabsList className='grid w-full grid-cols-5'>
-        <TabsTrigger value='settings'>Settings</TabsTrigger>
-        <TabsTrigger value='features'>Features</TabsTrigger>
-        <TabsTrigger value='processes'>Processes</TabsTrigger>
-        <TabsTrigger value='ai-baseline'>AI Vs Baseline</TabsTrigger>
-        <TabsTrigger value='blueprints'>Blueprints</TabsTrigger>
-      </TabsList>
-
-      <TabsContent value='settings' className='space-y-6'>
+    <div className='space-y-6'>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
             <div className='grid gap-6 lg:grid-cols-2'>
@@ -141,7 +141,7 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                 <CardHeader>
                   <CardTitle>General Information</CardTitle>
                   <CardDescription>
-                    Basic building details and location information
+                    Basic property details and location information
                   </CardDescription>
                 </CardHeader>
                 <CardContent className='space-y-4'>
@@ -150,12 +150,12 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                     name='id'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Building ID</FormLabel>
+                        <FormLabel>Property ID</FormLabel>
                         <FormControl>
                           <Input {...field} disabled className='bg-muted' />
                         </FormControl>
                         <FormDescription>
-                          Unique identifier for this building
+                          Unique identifier for this property
                         </FormDescription>
                       </FormItem>
                     )}
@@ -166,9 +166,9 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                     name='name'
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Building Name</FormLabel>
+                        <FormLabel>Property Name</FormLabel>
                         <FormControl>
-                          <Input {...field} placeholder='Enter building name' />
+                          <Input {...field} placeholder='Enter property name' />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -309,7 +309,7 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                           onSelect={field.onChange}
                         />
                         <FormDescription>
-                          Date when data collection began for this building
+                          Date when data collection began for this property
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -322,8 +322,8 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className='flex items-center'>
-                          RMS Degree Threshold to Close Building
-                          <InfoTooltip content='Temperature threshold for automatic building closure' />
+                          RMS Degree Threshold to Close Property
+                          <InfoTooltip content='Temperature threshold for automatic property closure' />
                         </FormLabel>
                         <FormControl>
                           <Input
@@ -411,7 +411,7 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                   <div>
                     <CardTitle>AI Configuration</CardTitle>
                     <CardDescription>
-                      Advanced AI parameters for building optimization
+                      Advanced AI parameters for property optimization
                     </CardDescription>
                   </div>
                 </div>
@@ -610,28 +610,22 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
                     control={form.control}
                     name='autoComfortScheduleLBGP'
                     render={({ field }) => (
-                      <FormItem>
-                        <FormLabel className='flex items-center'>
-                          Auto Comfort Schedule LBGP (%)
-                          <InfoTooltip content='Lower bound gas percentage for automatic comfort schedule' />
-                        </FormLabel>
+                      <FormItem className='flex flex-row items-center justify-between rounded-lg border p-4'>
+                        <div className='space-y-0.5'>
+                          <FormLabel className='text-base flex items-center'>
+                            Auto Comfort Schedule
+                            <InfoTooltip content='Enable automatic comfort schedule' />
+                          </FormLabel>
+                          <FormDescription>
+                            Automatically adjust comfort schedule based on conditions
+                          </FormDescription>
+                        </div>
                         <FormControl>
-                          <div className='space-y-2'>
-                            <Slider
-                              value={[field.value]}
-                              onValueChange={(value) => field.onChange(value[0])}
-                              min={0}
-                              max={100}
-                              step={0.1}
-                            />
-                            <div className='flex items-center justify-between text-sm text-muted-foreground'>
-                              <span>0%</span>
-                              <span className='font-medium'>{field.value.toFixed(1)}%</span>
-                              <span>100%</span>
-                            </div>
-                          </div>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
                         </FormControl>
-                        <FormMessage />
                       </FormItem>
                     )}
                   />
@@ -716,55 +710,7 @@ export function BuildingDetailForm({ buildingId = '1126' }: BuildingDetailFormPr
             </div>
           </form>
         </Form>
-      </TabsContent>
-
-      <TabsContent value='features'>
-        <Card>
-          <CardContent className='py-12'>
-            <div className='flex flex-col items-center justify-center text-center'>
-              <p className='text-muted-foreground text-lg'>
-                Features configuration will be available here
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value='processes'>
-        <Card>
-          <CardContent className='py-12'>
-            <div className='flex flex-col items-center justify-center text-center'>
-              <p className='text-muted-foreground text-lg'>
-                Process monitoring and configuration will be available here
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value='ai-baseline'>
-        <Card>
-          <CardContent className='py-12'>
-            <div className='flex flex-col items-center justify-center text-center'>
-              <p className='text-muted-foreground text-lg'>
-                AI vs Baseline comparison charts will be available here
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
-
-      <TabsContent value='blueprints'>
-        <Card>
-          <CardContent className='py-12'>
-            <div className='flex flex-col items-center justify-center text-center'>
-              <p className='text-muted-foreground text-lg'>
-                Building blueprints and floor plans will be available here
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </TabsContent>
-    </Tabs>
+    </div>
   )
 }
+

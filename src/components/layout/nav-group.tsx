@@ -32,14 +32,14 @@ import {
   type NavLink,
   type NavGroup as NavGroupProps,
 } from './types'
-import { useBuildingStore } from '@/stores/building-store'
+import { usePropertyStore } from '@/stores/property-store'
 
-function resolveUrl(url: string, dynamicUrl?: boolean, buildingId?: string): string {
-  if (!dynamicUrl || !url.includes(':buildingId')) {
+function resolveUrl(url: string, dynamicUrl?: boolean, propertyId?: string): string {
+  if (!dynamicUrl || !url.includes(':propertyId')) {
     return url
   }
-  const id = buildingId || '1126' // fallback to default
-  return url.replace(':buildingId', id)
+  const id = propertyId || '1126' // fallback to default
+  return url.replace(':propertyId', id)
 }
 
 export function NavGroup({ title, items }: NavGroupProps) {
@@ -73,8 +73,8 @@ function NavBadge({ children }: { children: ReactNode }) {
 
 function SidebarMenuLink({ item, href }: { item: NavLink; href: string }) {
   const { setOpenMobile } = useSidebar()
-  const { selectedBuilding } = useBuildingStore()
-  const resolvedUrl = resolveUrl(item.url as string, item.dynamicUrl, selectedBuilding?.id)
+  const { selectedProperty } = usePropertyStore()
+  const resolvedUrl = resolveUrl(item.url as string, item.dynamicUrl, selectedProperty?.id)
   return (
     <SidebarMenuItem>
       <SidebarMenuButton
@@ -100,7 +100,7 @@ function SidebarMenuCollapsible({
   href: string
 }) {
   const { setOpenMobile } = useSidebar()
-  const { selectedBuilding } = useBuildingStore()
+  const { selectedProperty } = usePropertyStore()
   return (
     <Collapsible
       asChild
@@ -119,7 +119,7 @@ function SidebarMenuCollapsible({
         <CollapsibleContent className='CollapsibleContent'>
           <SidebarMenuSub>
             {item.items.map((subItem) => {
-              const resolvedSubUrl = resolveUrl(subItem.url as string, subItem.dynamicUrl, selectedBuilding?.id)
+              const resolvedSubUrl = resolveUrl(subItem.url as string, subItem.dynamicUrl, selectedProperty?.id)
               return (
                 <SidebarMenuSubItem key={subItem.title}>
                   <SidebarMenuSubButton
@@ -149,7 +149,7 @@ function SidebarMenuCollapsedDropdown({
   item: NavCollapsible
   href: string
 }) {
-  const { selectedBuilding } = useBuildingStore()
+  const { selectedProperty } = usePropertyStore()
   return (
     <SidebarMenuItem>
       <DropdownMenu>
@@ -170,7 +170,7 @@ function SidebarMenuCollapsedDropdown({
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           {item.items.map((sub) => {
-            const resolvedSubUrl = resolveUrl(sub.url as string, sub.dynamicUrl, selectedBuilding?.id)
+            const resolvedSubUrl = resolveUrl(sub.url as string, sub.dynamicUrl, selectedProperty?.id)
             return (
               <DropdownMenuItem key={`${sub.title}-${resolvedSubUrl}`} asChild>
                 <Link

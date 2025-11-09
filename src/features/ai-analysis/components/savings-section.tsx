@@ -262,7 +262,7 @@ export function SavingsSection({ config, signalName, minSamples, categorySignals
                   <div className='text-3xl font-bold'>
                     {((totalSavings * pricePerUnit) / buildingArea).toFixed(2)} SEK/m²
                   </div>
-                  <p className='text-sm text-green-500'>↑ Building area: {buildingArea.toLocaleString()} m²</p>
+                  <p className='text-sm text-green-500'>↑ Property area: {buildingArea.toLocaleString()} m²</p>
                 </CardContent>
               </Card>
             </div>
@@ -319,7 +319,7 @@ export function SavingsSection({ config, signalName, minSamples, categorySignals
                       {((totalPotential * pricePerUnit) / buildingArea).toFixed(2)} SEK/m²
                     </div>
                     <p className='text-sm text-green-500 mt-1'>
-                      ↑ Building area: {buildingArea.toLocaleString()} m²
+                      ↑ Property area: {buildingArea.toLocaleString()} m²
                     </p>
                   </CardContent>
                 </Card>

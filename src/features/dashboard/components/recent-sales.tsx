@@ -12,7 +12,7 @@ export function RecentSales() {
           <div className='space-y-1'>
             <p className='text-sm leading-none font-medium'>AI Optimization Applied</p>
             <p className='text-muted-foreground text-sm'>
-              Building A - Floor 3
+              Property A - Floor 3
             </p>
           </div>
           <div className='text-sm text-muted-foreground'>2m ago</div>
@@ -26,7 +26,7 @@ export function RecentSales() {
           <div className='space-y-1'>
             <p className='text-sm leading-none font-medium'>Temperature Adjusted</p>
             <p className='text-muted-foreground text-sm'>
-              Building B - Conference Room
+              Property B - Conference Room
             </p>
           </div>
           <div className='text-sm text-muted-foreground'>15m ago</div>
@@ -40,7 +40,7 @@ export function RecentSales() {
           <div className='space-y-1'>
             <p className='text-sm leading-none font-medium'>Maintenance Required</p>
             <p className='text-muted-foreground text-sm'>
-              Building C - HVAC Unit 2
+              Property C - HVAC Unit 2
             </p>
           </div>
           <div className='text-sm text-muted-foreground'>1h ago</div>
@@ -54,7 +54,7 @@ export function RecentSales() {
         <div className='flex flex-1 flex-wrap items-center justify-between'>
           <div className='space-y-1'>
             <p className='text-sm leading-none font-medium'>Schedule Updated</p>
-            <p className='text-muted-foreground text-sm'>Building A - All Zones</p>
+            <p className='text-muted-foreground text-sm'>Property A - All Zones</p>
           </div>
           <div className='text-sm text-muted-foreground'>2h ago</div>
         </div>
@@ -66,9 +66,9 @@ export function RecentSales() {
         </Avatar>
         <div className='flex flex-1 flex-wrap items-center justify-between'>
           <div className='space-y-1'>
-            <p className='text-sm leading-none font-medium'>New Building Added</p>
+            <p className='text-sm leading-none font-medium'>New Property Added</p>
             <p className='text-muted-foreground text-sm'>
-              Building D - Downtown Office
+              Property D - Downtown Office
             </p>
           </div>
           <div className='text-sm text-muted-foreground'>3h ago</div>

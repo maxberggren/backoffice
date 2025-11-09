@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table'
-import { type ProcessViewerBuilding, type ProcessStatus } from '../data/schema'
+import { type ProcessViewerProperty, type ProcessStatus } from '../data/schema'
 
 const getStatusBadgeVariant = (status?: ProcessStatus): 'default' | 'secondary' | 'destructive' | 'outline' => {
   switch (status) {
@@ -45,7 +45,7 @@ const ProcessStatusCell = ({ status }: { status?: ProcessStatus }) => {
   )
 }
 
-export const processViewerColumns: ColumnDef<ProcessViewerBuilding>[] = [
+export const processViewerColumns: ColumnDef<ProcessViewerProperty>[] = [
   {
     id: 'select',
     header: ({ table }) => (
@@ -68,14 +68,14 @@ export const processViewerColumns: ColumnDef<ProcessViewerBuilding>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: 'building',
-    header: ({ column }) => <DataTableColumnHeader column={column} title="Building" />,
-    cell: ({ row }) => <div className="font-medium">{row.getValue('building')}</div>,
+    accessorKey: 'property',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="Property" />,
+    cell: ({ row }) => <div className="font-medium">{row.getValue('property')}</div>,
   },
   {
-    accessorKey: 'buildingId',
+    accessorKey: 'propertyId',
     header: ({ column }) => <DataTableColumnHeader column={column} title="Id" />,
-    cell: ({ row }) => <div className="text-sm text-muted-foreground">{row.getValue('buildingId')}</div>,
+    cell: ({ row }) => <div className="text-sm text-muted-foreground">{row.getValue('propertyId')}</div>,
   },
   {
     accessorKey: 'client',
