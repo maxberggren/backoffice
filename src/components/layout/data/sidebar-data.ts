@@ -145,19 +145,19 @@ export const sidebarData: SidebarData = {
       title: 'Insights',
       items: [
         {
-          title: 'ON vs OFF',
+          title: 'AI ON vs OFF',
           url: '/analysis/ai-on-vs-off',
+          icon: TrendingUp,
+        },
+        {
+          title: 'AI ON vs Baseline',
+          url: '/analysis/ai-vs-baseline',
           icon: TrendingUp,
         },
         {
           title: 'Group Comfort',
           url: '/analysis/comfort-groups',
           icon: Layers,
-        },
-        {
-          title: 'AI vs Baseline',
-          url: '/analysis/ai-vs-baseline',
-          icon: TrendingUp,
         },
         {
           title: 'Read-Write Discrepancies',

@@ -158,7 +158,7 @@ export function AIAnalysis() {
               <TrendingUp className='h-5 w-5 text-primary' />
             </div>
             <div>
-              <h2 className='text-2xl font-bold tracking-tight'>AI ON vs. OFF</h2>
+              <h2 className='text-2xl font-bold tracking-tight'>AI ON vs OFF</h2>
               <p className='text-muted-foreground text-sm'>
                 Analyze the impact of AI control systems by comparing ON vs OFF states under
                 temperature-normalized conditions

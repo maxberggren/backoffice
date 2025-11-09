@@ -72,7 +72,7 @@ export function AIVsBaseline() {
               <TrendingUp className='h-5 w-5 text-primary' />
             </div>
             <div>
-              <h2 className='text-2xl font-bold tracking-tight'>AI vs Baseline</h2>
+              <h2 className='text-2xl font-bold tracking-tight'>AI ON vs Baseline</h2>
               <p className='text-muted-foreground text-sm'>
                 Compare AI-controlled signal values with baseline (assumed off-state) values
               </p>
